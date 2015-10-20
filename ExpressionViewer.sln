@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MiniTestProject", "MiniTest
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extension", "Extension\Extension.csproj", "{80805C0C-E30C-428A-8A4A-54F98AC8D8CE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpressionViewerTests", "ExpressionViewerTests\ExpressionViewerTests.csproj", "{CA666055-7263-4018-808F-C035DE394EDA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{80805C0C-E30C-428A-8A4A-54F98AC8D8CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{80805C0C-E30C-428A-8A4A-54F98AC8D8CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{80805C0C-E30C-428A-8A4A-54F98AC8D8CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CA666055-7263-4018-808F-C035DE394EDA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA666055-7263-4018-808F-C035DE394EDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA666055-7263-4018-808F-C035DE394EDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA666055-7263-4018-808F-C035DE394EDA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
