@@ -9,7 +9,7 @@ namespace Extension
 {
     public class ExpressionSearcher
     {
-        public async Task<Nullable<int>> FindTarget(Solution solution)
+        public async Task<SyntaxNode> FindTarget(Solution solution)
         {
             if (solution == null)
             {
@@ -21,11 +21,19 @@ namespace Extension
             var projects = projectIds.Select(projectId => solution.GetProject(projectId));
 
             var compilation = (await projects.First().GetCompilationAsync());
-            //t.Wait();
-            //var compilation = t.Result;
             var roots = compilation.SyntaxTrees.Select(syntaxTree => syntaxTree.GetRoot());
+            var invocationExpressions = roots
+                .SelectMany(root => root.DescendantNodesAndSelf())
+                .Where(syntaxNode => syntaxNode.IsKind(Microsoft.CodeAnalysis.CSharp.SyntaxKind.MethodDeclaration))
+                .SelectMany(methodDeclaration => methodDeclaration.DescendantNodesAndSelf())
+                .Where(syntaxNode => syntaxNode.IsKind(Microsoft.CodeAnalysis.CSharp.SyntaxKind.InvocationExpression));
 
-            return null;
+            SyntaxNode foundInvocationExpression = null;
+            if (invocationExpressions.Any())
+            {
+                foundInvocationExpression = invocationExpressions.First();
+            }
+            return foundInvocationExpression;
         }
     }
 }

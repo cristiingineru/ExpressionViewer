@@ -17,7 +17,7 @@ namespace ExpressionViewerTests
 
             var result = await searcher.FindTarget(null);
 
-            Assert.IsFalse(result.HasValue);
+            Assert.IsNull(result);
         }
 
         [TestMethod]
@@ -28,7 +28,7 @@ namespace ExpressionViewerTests
             var solution = EmptySolution();
             var result = await searcher.FindTarget(solution);
 
-            Assert.IsFalse(result.HasValue);
+            Assert.IsNull(result);
         }
 
         [TestMethod]
@@ -39,7 +39,7 @@ namespace ExpressionViewerTests
             var solution = SolutionWithSingleMethod();
             var result = await searcher.FindTarget(solution);
 
-            Assert.IsTrue(result.HasValue);
+            Assert.IsNotNull(result);
         }
 
 
@@ -63,10 +63,11 @@ namespace ExpressionViewerTests
             var solution = workspace.AddSolution(solutionInfo);
 
             var root = CSharpSyntaxTree.ParseText(@"
-                public class MyClass
-                {
-                    public void MyMethod()
+                public void Do()
                     {
+                        var result = ""text""
+                            .ToString()
+                            .ToString();
                     }
                 }").GetRoot();
 

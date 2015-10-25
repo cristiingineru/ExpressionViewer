@@ -7,8 +7,9 @@ namespace MiniTestProject
     {
         public void Do()
         {
-            Console.WriteLine("It's working!");
-            Debug.WriteLine("Yes, it's working!");
+            var result = "text"
+                .ToString()
+                .ToString();
         }
     }
 }
