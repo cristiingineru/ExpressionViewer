@@ -11,7 +11,7 @@ namespace ExpressionViewerTests
     public class ExpressionSearcherTests
     {
         [TestMethod]
-        public async Task ExpressionSearcher_WithNullSolution_ReturnsNoValue()
+        public async Task FindSource_WithNullSolution_ReturnsNoValue()
         {
             var searcher = new ExpressionSearcher();
 
@@ -21,7 +21,7 @@ namespace ExpressionViewerTests
         }
 
         [TestMethod]
-        public async Task ExpressionSearcher_WithEmptySolution_ReturnsNoValue()
+        public async Task FindSource_WithEmptySolution_ReturnsNoValue()
         {
             var searcher = new ExpressionSearcher();
 
@@ -32,7 +32,7 @@ namespace ExpressionViewerTests
         }
 
         [TestMethod]
-        public async Task ExpressionSearcher_WithExpressionWithinMethod_ReturnsTheExpression()
+        public async Task FindSource_WithExpressionWithinMethod_ReturnsTheExpression()
         {
             var searcher = new ExpressionSearcher();
 
@@ -41,6 +41,27 @@ namespace ExpressionViewerTests
             var result = await searcher.FindSource(solution);
 
             Assert.AreEqual(expression, result.GetText().ToString());
+        }
+
+        [TestMethod]
+        public async Task FindTarget_WithNullSolution_ReturnsNoValue()
+        {
+            var searcher = new ExpressionSearcher();
+
+            var result = await searcher.FindTarget(null);
+
+            Assert.IsNull(result);
+        }
+
+        [TestMethod]
+        public async Task FindTarget_WithEmptySolution_ReturnsNoValue()
+        {
+            var searcher = new ExpressionSearcher();
+
+            var solution = EmptySolution();
+            var result = await searcher.FindTarget(solution);
+
+            Assert.IsNull(result);
         }
 
 

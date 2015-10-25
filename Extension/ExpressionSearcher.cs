@@ -38,5 +38,10 @@ namespace Extension
             }
             return foundInvocationExpression;
         }
+
+        public async Task<SyntaxNode> FindTarget(Solution solution)
+        {
+            return null;
+        }
     }
 }
