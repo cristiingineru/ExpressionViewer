@@ -15,7 +15,7 @@ namespace ExpressionViewerTests
         {
             var searcher = new ExpressionSearcher();
 
-            var result = await searcher.FindTarget(null);
+            var result = await searcher.FindSource(null);
 
             Assert.IsNull(result);
         }
@@ -26,20 +26,21 @@ namespace ExpressionViewerTests
             var searcher = new ExpressionSearcher();
 
             var solution = EmptySolution();
-            var result = await searcher.FindTarget(solution);
+            var result = await searcher.FindSource(solution);
 
             Assert.IsNull(result);
         }
 
         [TestMethod]
-        public async Task ExpressionSearcher_WithSolutionWithSingleMethod_ReturnsTheMethod()
+        public async Task ExpressionSearcher_WithExpressionWithinMethod_ReturnsTheExpression()
         {
             var searcher = new ExpressionSearcher();
 
-            var solution = SolutionWithSingleMethod();
-            var result = await searcher.FindTarget(solution);
+            var expression = "\"text\".ToString().ToString()";
+            var solution = SingleFileSolution(@"public void Do() { var result = " + expression + "; }");
+            var result = await searcher.FindSource(solution);
 
-            Assert.IsNotNull(result);
+            Assert.AreEqual(expression, result.GetText().ToString());
         }
 
 
@@ -54,7 +55,7 @@ namespace ExpressionViewerTests
             return solution;
         }
 
-        private Solution SolutionWithSingleMethod()
+        private Solution SingleFileSolution(string fileContent)
         {
             var id = SolutionId.CreateNewId();
             var version = new VersionStamp();
@@ -62,30 +63,19 @@ namespace ExpressionViewerTests
             var workspace = new AdhocWorkspace();
             var solution = workspace.AddSolution(solutionInfo);
 
-            var root = CSharpSyntaxTree.ParseText(@"
-                public void Do()
-                    {
-                        var result = ""text""
-                            .ToString()
-                            .ToString();
-                    }
-                }").GetRoot();
-
-
             var projectId = ProjectId.CreateNewId();
             var projectInfo = NewProjectInfo(projectId);
             solution = solution.AddProject(projectInfo);
             var project = solution.GetProject(projectId);
+
+            var root = CSharpSyntaxTree.ParseText(fileContent).GetRoot();
             var document = project.AddDocument("file.cs", root);
 
             return document.Project.Solution;
-
-            //return solution;
         }
 
         private ProjectInfo NewProjectInfo(ProjectId projectId)
         {
-            //var projectId = ProjectId.CreateNewId();
             var version = VersionStamp.Create();
             var projectInfo = ProjectInfo.Create(projectId, version, "no name", "assembly.dll", "C#");
 

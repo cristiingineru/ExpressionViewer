@@ -9,25 +9,28 @@ namespace Extension
 {
     public class ExpressionSearcher
     {
-        public async Task<SyntaxNode> FindTarget(Solution solution)
+        public async Task<SyntaxNode> FindSource(Solution solution)
         {
             if (solution == null)
             {
                 return null;
             }
 
-            var projectIds = solution.GetProjectDependencyGraph().GetTopologicallySortedProjects();
-
-            var projects = projectIds.Select(projectId => solution.GetProject(projectId));
-
-            var compilation = (await projects.First().GetCompilationAsync());
-            var roots = compilation.SyntaxTrees.Select(syntaxTree => syntaxTree.GetRoot());
-            var invocationExpressions = roots
+            var invocationExpressions = solution.GetProjectDependencyGraph().GetTopologicallySortedProjects()
+                .Select(async projectId =>
+                {
+                    var project = solution.GetProject(projectId);
+                    var compilation = (await project.GetCompilationAsync());
+                    return compilation;
+                })
+                .Select(compilationTask => compilationTask.Result)
+                .SelectMany(compilation => compilation.SyntaxTrees)
+                .Select(syntaxTree => syntaxTree.GetRoot())
                 .SelectMany(root => root.DescendantNodesAndSelf())
                 .Where(syntaxNode => syntaxNode.IsKind(Microsoft.CodeAnalysis.CSharp.SyntaxKind.MethodDeclaration))
                 .SelectMany(methodDeclaration => methodDeclaration.DescendantNodesAndSelf())
                 .Where(syntaxNode => syntaxNode.IsKind(Microsoft.CodeAnalysis.CSharp.SyntaxKind.InvocationExpression));
-
+            
             SyntaxNode foundInvocationExpression = null;
             if (invocationExpressions.Any())
             {
