@@ -4,6 +4,7 @@ using Extension;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using System.Threading.Tasks;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace ExpressionViewerTests
 {
@@ -37,7 +38,10 @@ namespace ExpressionViewerTests
             var searcher = new ExpressionSearcher();
 
             var expression = "\"text\".ToString().ToString()";
-            var solution = SingleFileSolution(@"public void Do() { var result = " + expression + "; }");
+            var solution = SingleFileSolution(@"
+            public void Do() {
+                var result = " + expression + @";
+            }");
             var result = await searcher.FindSource(solution);
 
             Assert.AreEqual(expression, result.GetText().ToString());
@@ -62,6 +66,23 @@ namespace ExpressionViewerTests
             var result = await searcher.FindTarget(solution);
 
             Assert.IsNull(result);
+        }
+
+        [TestMethod]
+        public async Task FindTarget_WithNamespaceInFileSolution_ReturnsTarget()
+        {
+            var searcher = new ExpressionSearcher();
+
+            var solution = SingleFileSolution(@"
+            namespace SimpleNamespace {
+                public class SimpleClass() {
+                    public void Do() {
+                    }
+                }
+            }");
+            var result = await searcher.FindTarget(solution);
+
+            Assert.IsTrue(result is NamespaceDeclarationSyntax);
         }
 
 

@@ -1,4 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,7 +42,30 @@ namespace Extension
 
         public async Task<SyntaxNode> FindTarget(Solution solution)
         {
-            return null;
+            if (solution == null)
+            {
+                return null;
+            }
+
+            var namespaceDeclarationSyntaxes = solution.GetProjectDependencyGraph().GetTopologicallySortedProjects()
+                .Select(async projectId =>
+                {
+                    var project = solution.GetProject(projectId);
+                    var compilation = (await project.GetCompilationAsync());
+                    return compilation;
+                })
+                .Select(compilationTask => compilationTask.Result)
+                .SelectMany(compilation => compilation.SyntaxTrees)
+                .Select(syntaxTree => syntaxTree.GetRoot())
+                .SelectMany(root => root.DescendantNodesAndSelf())
+                .OfType<NamespaceDeclarationSyntax>();
+
+            SyntaxNode foundNamespaceDeclarationSyntax = null;
+            if (namespaceDeclarationSyntaxes.Any())
+            {
+                foundNamespaceDeclarationSyntax = namespaceDeclarationSyntaxes.First();
+            }
+            return foundNamespaceDeclarationSyntax;
         }
     }
 }
