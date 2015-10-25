@@ -51,6 +51,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="ExpressionBuilder.cs" />
     <Compile Include="ExpressionSearcher.cs" />
     <Compile Include="ExpressionViewer.cs" />
     <Compile Include="ExpressionViewerCommand.cs" />
