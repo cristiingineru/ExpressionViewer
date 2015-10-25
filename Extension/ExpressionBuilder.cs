@@ -11,10 +11,15 @@ namespace Extension
 {
     public class ExpressionBuilder
     {
+        public static string WrapperClassName { get { return "WrapperClass"; } }
+
+        public static string WrapperMethodName { get { return "WrapperMethod"; } }
+
+
         public async Task<SyntaxNode> BuildWrapper(SyntaxNode innerExpression)
         {
             var newClass =
-                SyntaxFactory.ClassDeclaration("MyClass")
+                SyntaxFactory.ClassDeclaration(WrapperClassName)
                 .WithModifiers(
                     SyntaxFactory.TokenList(
                         SyntaxFactory.Token(
@@ -25,7 +30,7 @@ namespace Extension
                             SyntaxFactory.Token(
                                 SyntaxKind.StringKeyword)),
                         SyntaxFactory.Identifier(
-                            @"MyMethod"))
+                            WrapperMethodName))
                 .WithModifiers(
                     SyntaxFactory.TokenList(
                         SyntaxFactory.Token(
