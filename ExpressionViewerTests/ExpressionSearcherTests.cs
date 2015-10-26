@@ -89,23 +89,24 @@ namespace ExpressionViewerTests
         }
 
 
-        //[TestMethod]
-        //public async Task ReplaceNodeInSolution_WithOldAndNewNodes_ReturnsNewUpdatedSolution()
-        //{
-        //    var searcher = new ExpressionSearcher();
-        //    var solution = SingleFileSolution(@"
-        //    namespace SimpleNamespace {
-        //        public class SimpleClass() {
-        //            public void Do() {
-        //            }
-        //        }
-        //    }");
-        //    var oldNode = await searcher.FindTarget(solution);
-        //    SyntaxNode newNode = null;
+        [TestMethod]
+        public async Task ReplaceNodeInCompilation_WithOldAndNewNodes_ReturnsNewUpdatedCompilation()
+        {
+            var searcher = new ExpressionSearcher();
+            var solution = SingleFileSolution(@"
+            namespace SimpleNamespace {
+                public class SimpleClass() {
+                    public void Do() {
+                    }
+                }
+            }");
+            var target = await searcher.FindTarget(solution);
+            SyntaxNode newNode = null;
 
-        //    var newSolution = searcher.ReplaceNodeInSolution(oldNode, newNode);
+            var newCompilation = searcher.ReplaceNodeInCompilation(target.Compilation, target.Node, newNode);
 
-        //}
+            Assert.AreNotEqual(target.Compilation, newCompilation);
+        }
 
         private Solution EmptySolution()
         {

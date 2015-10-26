@@ -80,7 +80,7 @@ namespace Extension
                 .OfType<NamespaceDeclarationSyntax>();
         }
 
-        public Compilation ReplaceNodeInSolution(Compilation compilation, SyntaxNode node, SyntaxNode newNode)
+        public Compilation ReplaceNodeInCompilation(Compilation compilation, SyntaxNode node, SyntaxNode newNode)
         {
             var syntaxTree = node.SyntaxTree;
             var root = syntaxTree.GetRoot();
