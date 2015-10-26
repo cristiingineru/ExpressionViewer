@@ -13,17 +13,26 @@ namespace Extension
         {
             if (disposed == false)
             {
+                try
+                {
+                    Directory.Delete(FullName, true);
+                }
+                catch (Exception)
+                {
+                    // Files in use can prevent deleting the parent directory.
+                    // It's fine since this operation is meant to save some disk space only.
+                }
                 disposed = true;
             }
         }
 
         public TempDirectory()
         {
-            Directory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-            System.IO.Directory.CreateDirectory(Directory);
+            FullName = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+            Directory.CreateDirectory(FullName);
         }
 
-        public string Directory { get; private set; }
+        public string FullName { get; private set; }
 
         private bool disposed = false;
     }
