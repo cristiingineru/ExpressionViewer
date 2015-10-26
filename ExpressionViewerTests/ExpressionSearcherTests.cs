@@ -54,7 +54,8 @@ namespace ExpressionViewerTests
 
             var result = await searcher.FindTarget(null);
 
-            Assert.IsNull(result);
+            Assert.IsNull(result.Node);
+            Assert.IsNull(result.Compilation);
         }
 
         [TestMethod]
@@ -65,7 +66,8 @@ namespace ExpressionViewerTests
             var solution = EmptySolution();
             var result = await searcher.FindTarget(solution);
 
-            Assert.IsNull(result);
+            Assert.IsNull(result.Node);
+            Assert.IsNull(result.Compilation);
         }
 
         [TestMethod]
@@ -82,9 +84,28 @@ namespace ExpressionViewerTests
             }");
             var result = await searcher.FindTarget(solution);
 
-            Assert.IsTrue(result is NamespaceDeclarationSyntax);
+            Assert.IsTrue(result.Node is NamespaceDeclarationSyntax);
+            Assert.IsNotNull(result.Compilation);
         }
 
+
+        //[TestMethod]
+        //public async Task ReplaceNodeInSolution_WithOldAndNewNodes_ReturnsNewUpdatedSolution()
+        //{
+        //    var searcher = new ExpressionSearcher();
+        //    var solution = SingleFileSolution(@"
+        //    namespace SimpleNamespace {
+        //        public class SimpleClass() {
+        //            public void Do() {
+        //            }
+        //        }
+        //    }");
+        //    var oldNode = await searcher.FindTarget(solution);
+        //    SyntaxNode newNode = null;
+
+        //    var newSolution = searcher.ReplaceNodeInSolution(oldNode, newNode);
+
+        //}
 
         private Solution EmptySolution()
         {
