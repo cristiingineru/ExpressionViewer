@@ -11,5 +11,10 @@ namespace MiniTestProject
                 .ToString()
                 .ToString();
         }
+
+        public static string SayHello()
+        {
+            return "Hello";
+        }
     }
 }

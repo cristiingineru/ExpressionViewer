@@ -109,6 +109,10 @@
       <Project>{80805c0c-e30c-428a-8a4a-54f98ac8d8ce}</Project>
       <Name>Extension</Name>
     </ProjectReference>
+    <ProjectReference Include="..\MiniTestProject\MiniTestProject.csproj">
+      <Project>{47c46609-8d35-4dff-af09-247f4900e5ad}</Project>
+      <Name>MiniTestProject</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
