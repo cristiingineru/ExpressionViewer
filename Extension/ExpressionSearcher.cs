@@ -17,14 +17,21 @@ namespace Extension
                 return null;
             }
 
-            var invocationExpressions = solution.GetProjectDependencyGraph().GetTopologicallySortedProjects()
-                .Select(async projectId =>
+            var compilationTasks = solution.GetProjectDependencyGraph().GetTopologicallySortedProjects()
+                .Select(projectId =>
                 {
                     var project = solution.GetProject(projectId);
-                    var compilation = (await project.GetCompilationAsync());
+                    var compilation = project.GetCompilationAsync();
                     return compilation;
-                })
-                .Select(compilationTask => compilationTask.Result)
+                });
+
+            foreach(var task in compilationTasks)
+            {
+                task.Wait();
+            }
+
+            var invocationExpressions = compilationTasks
+                .Select(task => task.Result)
                 .SelectMany(compilation => compilation.SyntaxTrees)
                 .Select(syntaxTree => syntaxTree.GetRoot())
                 .SelectMany(root => root.DescendantNodesAndSelf())
