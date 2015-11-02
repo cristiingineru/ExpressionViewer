@@ -44,7 +44,8 @@ namespace Extension
             using (var tempDirectory = new TempDirectory())
             {
                 var workspace2 = MSBuildWorkspace.Create();
-                var task2 = workspace2.OpenSolutionAsync(@"C:\Users\Cristi\Documents\Visual Studio 2015\Projects\MiniProject\MiniProject.sln");
+                //var task2 = workspace2.OpenSolutionAsync(@"..\..\..\ManualTesting\ManualTesting.sln");
+                var task2 = workspace2.OpenSolutionAsync(@"D:\Projects\ExpressionViewer\ManualTesting\ManualTesting.sln");
                 task2.Wait();
                 var solution2 = task2.Result;
                 var newSolution2 = solution2.GetIsolatedSolution();
@@ -70,62 +71,6 @@ namespace Extension
 
                 //var root2 = target2.Compilation.SyntaxTrees
             }
-
-                var workspace = MSBuildWorkspace.Create();
-            var task = workspace.OpenSolutionAsync(@"C:\Users\Cristi\Documents\Visual Studio 2015\Projects\MiniProject\MiniProject.sln");
-            task.Wait();
-            var solution = task.Result;
-            var projects = solution.Projects;
-
-            var project0 = projects.ElementAt(0);
-            var newCompilationOptions = projects.First().CompilationOptions.WithOptimizationLevel(OptimizationLevel.Debug);
-
-            solution = solution.WithProjectCompilationOptions(project0.Id, newCompilationOptions);
-
-            //var ar = new AnalyzerReference();
-            //solution.AddAnalyzerReference(project0.Id, ar);
-            var newSolution = solution.GetIsolatedSolution();
-
-            var assemblies = new List<Stream>();
-            foreach (var projectId in solution.GetProjectDependencyGraph().GetTopologicallySortedProjects())
-            {
-                var projectName = solution.GetProject(projectId).Name;
-                //using (var stream = new MemoryStream())
-                using (var stream = new FileStream(projectName + ".dll", FileMode.Create))
-                {
-                    var t2 = solution.GetProject(projectId).GetCompilationAsync();
-                    t2.Wait();
-                    var compilationUnit = t2.Result;
-                    var syntaxTrees = compilationUnit.SyntaxTrees;
-                    var syntaxTree = syntaxTrees.ElementAt(0);
-                    var root = syntaxTree.GetRoot();
-                    var options = syntaxTree.Options;
-                    var newOptions = options;
-
-                    //var target = FindInsertParent(root);
-                    //var newRoot = target.InsertNodesAfter(null, new[] { GenerateNode() });
-
-                    var target = FindDestinationParent(root);
-                    var source = FindNodeToBeCopied(root);
-                    var newTarget = target
-                        .InsertNodesBefore(target.ChildNodes().Last(), new[] { GenerateBranchToBeInserted(source) });
-
-                    var newRoot = root.ReplaceNode(target, newTarget);
-
-                    var newSyntaxTree = syntaxTree.WithRootAndOptions(newRoot, newOptions);
-                    var newCompilationUnit = compilationUnit.ReplaceSyntaxTree(syntaxTree, newSyntaxTree);
-                    var emitResult = newCompilationUnit.Emit(stream);
-                    assemblies.Add(stream);
-                }
-            }
-
-            var dll = Assembly.LoadFile(Path.Combine(Directory.GetCurrentDirectory(), "MiniProject.dll"));
-            var myClass = dll.GetExportedTypes()
-                .Where(type => type.Name.Contains("MyClass"))
-                .First();
-            dynamic myObject = System.Activator.CreateInstance(myClass);
-            myClass.GetMethod("MyMethod", BindingFlags.Public | BindingFlags.Static).Invoke(null, null);
-
         }
 
         private SyntaxNode FindDestinationParent(SyntaxNode root)

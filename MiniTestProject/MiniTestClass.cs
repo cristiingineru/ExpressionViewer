@@ -5,16 +5,18 @@ namespace MiniTestProject
 {
     public class MiniTestClass
     {
-        public void Do()
+        public string Do()
         {
-            var result = "text"
+            return "text"
                 .ToString()
                 .ToString();
         }
 
         public static string SayHello()
         {
-            return "Hello";
+            return "hello"
+                .Insert(0, "<a>")
+                .ToString();
         }
     }
 }
