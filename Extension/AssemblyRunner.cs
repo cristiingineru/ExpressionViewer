@@ -14,39 +14,17 @@ namespace Extension
 
         public AssemblyRunner()
         {
-            AppDomainSetup domainSetup = new AppDomainSetup();
-            domainSetup.ApplicationName = "newAppDomain";
-            domainSetup.ApplicationBase = Environment.CurrentDirectory;                 
-            DifferentAppDomain = AppDomain.CreateDomain("newAppDomain", null, domainSetup);
-            AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(CurrentDomain_AssemblyResolve);
+            DifferentAppDomain = CreateNewAppDomain("newAppDomain");
         }
 
-        private static string LastRequestedAssembly = String.Empty;
-
-        Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
+        private AppDomain CreateNewAppDomain(string friendlyName)
         {
-            if (args.Name == LastRequestedAssembly)
-            {
-                return null;
-            }
-            LastRequestedAssembly = args.Name;
-            try
-            {
-                Assembly assembly = System.Reflection.Assembly.Load(args.Name);
-                if (assembly != null)
-                    return assembly;
-            }
-            catch
-            { /* ignore load error */ }
-
-            // *** Try to load by filename - split out the filename of the full assembly name
-            // *** and append the base path of the original assembly (ie. look in the same dir)
-            // *** NOTE: this doesn't account for special search paths but then that never
-            //           worked before either.
-            string[] Parts = args.Name.Split(',');
-            string File = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\" + Parts[0].Trim() + ".dll";
-
-            return System.Reflection.Assembly.LoadFrom(File);
+            AppDomainSetup domainSetup = new AppDomainSetup();
+            domainSetup.ApplicationName = friendlyName;
+            domainSetup.ApplicationBase = Environment.CurrentDirectory;
+            AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(CurrentDomain_AssemblyResolve);
+            var newAppDomain = AppDomain.CreateDomain(friendlyName, null, domainSetup);
+            return newAppDomain;
         }
 
         public string Run(string assemblyName, string className, string methodName)
@@ -85,6 +63,41 @@ namespace Extension
         }
 
         private bool disposed = false;
+
+        private static string LastRequestedAssembly = string.Empty;
+
+        /// <summary>
+        /// This event is needed in tests only. Running in production didn't required this workaround.
+        /// Details here:
+        /// http://stackoverflow.com/questions/1437831/appdomain-createinstancefromandunwrap-unable-to-cast-transparent-proxy
+        /// http://weblog.west-wind.com/posts/2009/Jan/19/Assembly-Loading-across-AppDomains
+        /// </summary>
+        Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
+        {
+            if (args.Name == LastRequestedAssembly)
+            {
+                /// I'm preventing a stack overflow in case the assemly was not found
+                return null;
+            }
+            LastRequestedAssembly = args.Name;
+            try
+            {
+                Assembly assembly = Assembly.Load(args.Name);
+                if (assembly != null)
+                {
+                    return assembly;
+                }
+            }
+            catch
+            {
+                /* ignore load error */
+            }
+
+            string[] Parts = args.Name.Split(',');
+            string File = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\" + Parts[0].Trim() + ".dll";
+
+            return Assembly.LoadFrom(File);
+        }
 
 
         private class Proxy : MarshalByRefObject

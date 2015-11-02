@@ -68,71 +68,7 @@ namespace Extension
                 var emitResult = newCompilation.Emit(instrumentedDll);
                 var assemblyRunner = new AssemblyRunner();
                 var result = assemblyRunner.Run(instrumentedDll, "WrapperClass", "WrapperMethod");
-
-                //var root2 = target2.Compilation.SyntaxTrees
             }
-        }
-
-        private SyntaxNode FindDestinationParent(SyntaxNode root)
-        {
-            var target = root
-                .DescendantNodes()
-                .OfType<NamespaceDeclarationSyntax>().First();
-
-            return target;
-        }
-
-        private SyntaxNode FindNodeToBeCopied(SyntaxNode root)
-        {
-            var target = root
-                .DescendantNodes()
-                .OfType<MethodDeclarationSyntax>().First()
-                .ChildNodes()
-                .OfType<BlockSyntax>().First();
-
-            return target;
-        }
-
-        private SyntaxNode GenerateBranchToBeInserted(SyntaxNode source)
-        {
-            var newClass =
-                SyntaxFactory.ClassDeclaration("MyClass")
-                .WithModifiers(
-                    SyntaxFactory.TokenList(
-                        SyntaxFactory.Token(
-                            SyntaxKind.PublicKeyword)))
-                .AddMembers(
-                    SyntaxFactory.MethodDeclaration(
-                        SyntaxFactory.PredefinedType(
-                            SyntaxFactory.Token(
-                                SyntaxKind.VoidKeyword)),
-                        SyntaxFactory.Identifier(
-                            @"MyMethod"))
-                .WithModifiers(
-                    SyntaxFactory.TokenList(
-                        SyntaxFactory.Token(
-                            SyntaxKind.PublicKeyword),
-                        SyntaxFactory.Token(
-                            SyntaxKind.StaticKeyword)))
-                .WithParameterList(
-                    SyntaxFactory.ParameterList()
-                    .WithOpenParenToken(
-                        SyntaxFactory.Token(
-                            SyntaxKind.OpenParenToken))
-                    .WithCloseParenToken(
-                        SyntaxFactory.Token(
-                            SyntaxKind.CloseParenToken)))
-                .WithBody(
-                    SyntaxFactory.Block(
-                        source as StatementSyntax)
-                    .WithOpenBraceToken(
-                        SyntaxFactory.Token(
-                            SyntaxKind.OpenBraceToken))
-                    .WithCloseBraceToken(
-                        SyntaxFactory.Token(
-                            SyntaxKind.CloseBraceToken))));
-
-            return newClass;
         }
     }
 }
