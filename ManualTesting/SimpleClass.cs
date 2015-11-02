@@ -10,10 +10,10 @@ namespace ManualTesting
     {
         public string SimpleMethod()
         {
-            return "Hello"
-                .Insert(0, " ")
-                .Insert(0, ":")
-                .Insert(0, "Just wanted to say");
+            return new StringBuilder("Hello!!!")
+                .Insert(0, "<a>")
+                .Append("</a>")
+                .ToString();
         }
     }
 }
