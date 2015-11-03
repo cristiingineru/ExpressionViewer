@@ -1,4 +1,6 @@
 ﻿using Extension;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -62,7 +64,7 @@ namespace ExpressionViewerTests
         {
             var runner = new AssemblyRunner();
 
-            var result = runner.Run("MiniTestProject.dll", "MiniTestClass", "SayHello");
+            var result = runner.Run("DummyDll.dll", "DummyClass", "SayHello");
 
             Assert.IsFalse(string.IsNullOrEmpty(result));
         }
@@ -72,7 +74,7 @@ namespace ExpressionViewerTests
         {
             var runner = new AssemblyRunner();
 
-            var result = runner.Run(Path.Combine(Directory.GetCurrentDirectory(), "MiniTestProject.dll"), "MiniTestClass", "SayHello");
+            var result = runner.Run(Path.Combine(Directory.GetCurrentDirectory(), "DummyDll.dll"), "DummyClass", "SayHello");
 
             Assert.IsFalse(string.IsNullOrEmpty(result));
         }
