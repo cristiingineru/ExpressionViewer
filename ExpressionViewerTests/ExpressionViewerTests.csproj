@@ -103,6 +103,7 @@
     <Compile Include="ExpressionSearcherTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TempDirectoryTests.cs" />
+    <Compile Include="ViewGeneratorTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Extension\Extension.csproj">
