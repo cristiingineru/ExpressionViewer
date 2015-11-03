@@ -35,7 +35,7 @@ namespace ExpressionViewerTests
 
         private string SavedSolutionPath()
         {
-            return @"..\..\..\ManualTesting\ManualTesting.sln";
+            return @"..\..\..\TestSolutions\ValidSolution\ValidSolution.sln";
         }
     }
 }

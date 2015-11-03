@@ -44,7 +44,7 @@ namespace Extension
         {
             var generator = new ViewGenerator();
 
-            var solutionPath = @"..\..\..\ManualTesting\ManualTesting.sln";
+            var solutionPath = @"..\..\..\TestSolutions\ManualTesting\ManualTesting.sln";
             textBox.Text = await generator.GenerateViewAsync(solutionPath);
         }
     }
