@@ -7,7 +7,7 @@ namespace DummyDll
     {
         public static string SayHello()
         {
-            return "hello";
+            return "Hello";
         }
     }
 }
