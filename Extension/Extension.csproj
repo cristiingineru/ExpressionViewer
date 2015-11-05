@@ -61,6 +61,7 @@
     </Compile>
     <Compile Include="ExpressionViewerPackage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Runner.cs" />
     <Compile Include="TempDirectory.cs" />
     <Compile Include="ViewGenerator.cs" />
   </ItemGroup>

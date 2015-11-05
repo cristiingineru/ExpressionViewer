@@ -9,6 +9,7 @@ using System.ComponentModel.Design;
 using System.Globalization;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using EnvDTE;
 
 namespace Extension
 {
@@ -102,6 +103,9 @@ namespace Extension
 
             IVsWindowFrame windowFrame = (IVsWindowFrame)window.Frame;
             Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());
+
+
+            var dte = (DTE)ServiceProvider.GetService(typeof(DTE));
         }
     }
 }
