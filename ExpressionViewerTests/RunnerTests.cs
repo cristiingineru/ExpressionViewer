@@ -21,7 +21,7 @@ namespace ExpressionViewerTests
 
             sourceMonitor.Raise(mock => mock.SourceChanged += null, new EventArgs());
 
-            viewDrawer.Verify(mock => mock.Draw());
+            viewDrawer.Verify(mock => mock.Draw(), Times.Once());
         }
     }
 }

@@ -27,56 +27,62 @@ namespace ExpressionViewerTests
         [TestMethod]
         public void AssemblyRunner_Constructor_ReturnsIDisposable()
         {
-            var runner = new AssemblyRunner();
-
-            Assert.IsTrue(runner is IDisposable);
+            using (var runner = new AssemblyRunner())
+            {
+                Assert.IsTrue(runner is IDisposable);
+            }
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
         public void AssemblyRunner_WithNullClassName_Fails()
         {
-            var runner = new AssemblyRunner();
-
-            runner.Run("assembly.dll", null, "methodName");
+            using (var runner = new AssemblyRunner())
+            {
+                runner.Run("assembly.dll", null, "methodName");
+            }
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
         public void AssemblyRunner_WithNullMethodName_Fails()
         {
-            var runner = new AssemblyRunner();
-
-            runner.Run("assembly.dll", "className", null);
+            using (var runner = new AssemblyRunner())
+            {
+                runner.Run("assembly.dll", "className", null);
+            }
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
         public void AssemblyRunner_WithNullAssembly_Fails()
         {
-            var runner = new AssemblyRunner();
-
-            runner.Run(null, "className", "methodName");
+            using (var runner = new AssemblyRunner())
+            {
+                runner.Run(null, "className", "methodName");
+            }
         }
 
         [TestMethod]
         public void AssemblyRunner_WithValidArguments_ReturnsString()
         {
-            var runner = new AssemblyRunner();
+            using (var runner = new AssemblyRunner())
+            {
+                var result = runner.Run("DummyDll.dll", "DummyClass", "SayHello");
 
-            var result = runner.Run("DummyDll.dll", "DummyClass", "SayHello");
-
-            Assert.IsFalse(string.IsNullOrEmpty(result));
+                Assert.IsFalse(string.IsNullOrEmpty(result));
+            }
         }
 
         [TestMethod]
         public void AssemblyRunner_WithFullPathDll_ReturnsString()
         {
-            var runner = new AssemblyRunner();
+            using (var runner = new AssemblyRunner())
+            {
+                var result = runner.Run(Path.Combine(Directory.GetCurrentDirectory(), "DummyDll.dll"), "DummyClass", "SayHello");
 
-            var result = runner.Run(Path.Combine(Directory.GetCurrentDirectory(), "DummyDll.dll"), "DummyClass", "SayHello");
-
-            Assert.IsFalse(string.IsNullOrEmpty(result));
+                Assert.IsFalse(string.IsNullOrEmpty(result));
+            }
         }
     }
 }

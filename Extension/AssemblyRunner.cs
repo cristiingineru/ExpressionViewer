@@ -11,20 +11,26 @@ namespace Extension
     public class AssemblyRunner : IDisposable
     {
         public AppDomain DifferentAppDomain { get; private set; }
+        public Action DifferentAppDomainDestructor { get; private set; }
 
         public AssemblyRunner()
         {
-            DifferentAppDomain = CreateNewAppDomain("newAppDomain");
+            var result = CreateNewAppDomain("newAppDomain");
+
+            DifferentAppDomain = result.Item1;
+            DifferentAppDomainDestructor = result.Item2;
         }
 
-        private AppDomain CreateNewAppDomain(string friendlyName)
+        private Tuple<AppDomain, Action> CreateNewAppDomain(string friendlyName)
         {
             AppDomainSetup domainSetup = new AppDomainSetup();
             domainSetup.ApplicationName = friendlyName;
             domainSetup.ApplicationBase = Environment.CurrentDirectory;
-            AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(CurrentDomain_AssemblyResolve);
+            var assemblyResolveEventHandler = new ResolveEventHandler(CurrentDomain_AssemblyResolve);
+            AppDomain.CurrentDomain.AssemblyResolve += assemblyResolveEventHandler;
+            Action destructor = () => AppDomain.CurrentDomain.AssemblyResolve -= assemblyResolveEventHandler;
             var newAppDomain = AppDomain.CreateDomain(friendlyName, null, domainSetup);
-            return newAppDomain;
+            return Tuple.Create(newAppDomain, destructor);
         }
 
         public string Run(string assemblyName, string className, string methodName)
@@ -57,6 +63,7 @@ namespace Extension
         {
             if (disposed == false)
             {
+                DifferentAppDomainDestructor();
                 AppDomain.Unload(DifferentAppDomain);
                 disposed = true;
             }
