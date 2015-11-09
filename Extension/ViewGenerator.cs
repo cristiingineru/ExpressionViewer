@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Extension
 {
-    public class ViewGenerator
+    public class ViewGenerator : IViewGenerator
     {
         public async Task<string> GenerateViewAsync(string solutionPath)
         {

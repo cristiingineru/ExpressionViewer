@@ -23,7 +23,7 @@ namespace Extension
     /// <summary>
     /// Interaction logic for ExpressionViewerControl.
     /// </summary>
-    public partial class ExpressionViewerControl : UserControl
+    public partial class ExpressionViewerControl : UserControl, IView
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ExpressionViewerControl"/> class.
@@ -31,6 +31,11 @@ namespace Extension
         public ExpressionViewerControl()
         {
             this.InitializeComponent();
+        }
+
+        public void SetText(string content)
+        {
+            textBox.Text = content;
         }
 
         /// <summary>
