@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ExpressionViewerTests
@@ -40,6 +41,29 @@ namespace ExpressionViewerTests
             viewController.Draw(content);
 
             view.Verify(mock => mock.SetText(content));
+        }
+
+        [TestMethod]
+        public void SourceMonitor_Object_IsDisposable()
+        {
+            var sourceMonitor = new SourceMonitor();
+
+            Assert.IsTrue(sourceMonitor is IDisposable);
+        }
+
+        [TestMethod]
+        public void SourceMonitor_FromTimeToTime_TriggerSourceChanged()
+        {
+            var sourceMonitor = new SourceMonitor();
+
+            var changes = 0;
+            sourceMonitor.SourceChanged += (s, e) => changes += 1;
+
+            var arbitraryExpectedChanges = 5;
+            while (changes < arbitraryExpectedChanges)
+            {
+                Thread.Sleep(10);
+            }
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows.Controls;
 
 namespace Extension
@@ -15,6 +16,30 @@ namespace Extension
     public interface ISourceMonitor
     {
         event EventHandler SourceChanged;
+    }
+
+    public class SourceMonitor : ISourceMonitor, IDisposable
+    {
+        public event EventHandler SourceChanged;
+
+        public SourceMonitor()
+        {
+            Timer = new Timer(1000);
+            Timer.Elapsed += (sender, args) => SourceChanged(sender, args);
+            Timer.Start();
+        }
+
+        public void Dispose()
+        {
+            if (disposed == false)
+            {
+                Timer.Stop();
+                disposed = true;
+            }
+        }
+
+        private Timer Timer;
+        private bool disposed = false;
     }
 
     public interface IView
