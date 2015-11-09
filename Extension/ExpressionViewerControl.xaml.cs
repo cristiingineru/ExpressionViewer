@@ -18,6 +18,7 @@ namespace Extension
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.CSharp;
     using System;
+    using System.Windows.Threading;
 
 
     /// <summary>
@@ -35,7 +36,10 @@ namespace Extension
 
         public void SetText(string content)
         {
-            textBox.Text = content;
+            Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+               {
+                   textBox.Text = content;
+               }));
         }
 
         /// <summary>

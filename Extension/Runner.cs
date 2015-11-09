@@ -1,4 +1,5 @@
-﻿using System;
+﻿using EnvDTE;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,15 +19,47 @@ namespace Extension
         event EventHandler SourceChanged;
     }
 
+    public class SourceMonitorArgs : EventArgs
+    {
+        public string Solution { get; internal set; }
+        public SourceMonitorArgs(string solution)
+        {
+            this.Solution = solution;
+        }
+    }
+
     public class SourceMonitor : ISourceMonitor, IDisposable
     {
         public event EventHandler SourceChanged;
 
-        public SourceMonitor()
+        public SourceMonitor(IServiceProvider serviceProvider)
         {
             Timer = new Timer(1000);
-            Timer.Elapsed += (sender, args) => SourceChanged(sender, args);
+            Timer.Elapsed += (sender, args) =>
+            {
+                var solutionFullName = GetSolutionFullName(serviceProvider);
+                var arguments = new SourceMonitorArgs(solutionFullName);
+                SourceChanged(this, arguments);
+            };
             Timer.Start();
+        }
+
+        private string GetSolutionFullName(IServiceProvider serviceProvider)
+        {
+            var solutionFullName = String.Empty;
+            if (serviceProvider != null)
+            {
+                var dte = (DTE)serviceProvider.GetService(typeof(DTE));
+                if (dte != null)
+                {
+                    var solution = dte.Solution;
+                    if (solution != null)
+                    {
+                        solutionFullName = solution.FullName;
+                    }
+                }
+            }
+            return solutionFullName;
         }
 
         public void Dispose()
@@ -80,7 +113,8 @@ namespace Extension
 
             SourceMonitor.SourceChanged += async (s, e) =>
             {
-                var content = await viewGenerator.GenerateViewAsync("solution.sln");
+                var arguments = e as SourceMonitorArgs;
+                var content = await viewGenerator.GenerateViewAsync(arguments.Solution);
                 ViewController.Draw(content);
             };
         }

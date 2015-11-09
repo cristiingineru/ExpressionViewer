@@ -104,8 +104,17 @@ namespace Extension
             IVsWindowFrame windowFrame = (IVsWindowFrame)window.Frame;
             Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());
 
-
             var dte = (DTE)ServiceProvider.GetService(typeof(DTE));
+
+            Setup(ServiceProvider, window.Content as ExpressionViewerControl);
+        }
+
+        private void Setup(IServiceProvider serviceProvider, ExpressionViewerControl view)
+        {
+            var sourceMonitor = new SourceMonitor(serviceProvider);
+            var viewController = new ExpressionViewController(view);
+            var viewGenerator = new ViewGenerator();
+            var runner = new Runner(sourceMonitor, viewController, viewGenerator);
         }
     }
 }
