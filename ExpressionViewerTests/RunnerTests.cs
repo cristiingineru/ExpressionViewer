@@ -59,7 +59,7 @@ namespace ExpressionViewerTests
             var changes = 0;
             sourceMonitor.SourceChanged += (s, e) => changes += 1;
 
-            var arbitraryExpectedChanges = 5;
+            var arbitraryExpectedChanges = 3;
             while (changes < arbitraryExpectedChanges)
             {
                 Thread.Sleep(10);

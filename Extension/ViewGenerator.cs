@@ -29,7 +29,7 @@ namespace Extension
                     var target = await expressionSearcher.FindTarget(newSolution);
                     var instrumentation = await expressionBuilder.BuildWrapper(source);
 
-                    var newCompilation = expressionSearcher.ReplaceNodeInCompilation(target.Compilation, target.Node, instrumentation);
+                    var newCompilation = expressionSearcher.InsertNodeInCompilation(target.Compilation, target.Node, instrumentation);
 
                     var instrumentedDll = Path.Combine(tempDirectory.FullName, Path.GetRandomFileName() + ".dll");
                     var emitResult = newCompilation.Emit(instrumentedDll);

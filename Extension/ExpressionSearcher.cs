@@ -60,7 +60,7 @@ namespace Extension
                 return new Target();
             }
 
-            var namespaceDeclarationSyntaxes = solution.GetProjectDependencyGraph().GetTopologicallySortedProjects()
+            var classDeclarationSyntaxes = solution.GetProjectDependencyGraph().GetTopologicallySortedProjects()
                 .Select(async projectId =>
                 {
                     var project = solution.GetProject(projectId);
@@ -68,31 +68,31 @@ namespace Extension
                     return compilation;
                 })
                 .Select(compilationTask => compilationTask.Result)
-                .Where(compilation => GetNamespaceDeclarationSyntaxes(compilation).Any())
-                .Select(compilation => new Target() { Compilation = compilation, Node = GetNamespaceDeclarationSyntaxes(compilation).First() } );
+                .Where(compilation => GetClassDeclarationSyntaxes(compilation).Any())
+                .Select(compilation => new Target() { Compilation = compilation, Node = GetClassDeclarationSyntaxes(compilation).First() } );
 
             var foundNamespaceDeclarationSyntax = new Target();
-            if (namespaceDeclarationSyntaxes.Any())
+            if (classDeclarationSyntaxes.Any())
             {
-                foundNamespaceDeclarationSyntax = namespaceDeclarationSyntaxes.First();
+                foundNamespaceDeclarationSyntax = classDeclarationSyntaxes.First();
             }
             return foundNamespaceDeclarationSyntax;
         }
 
-        private static IEnumerable<NamespaceDeclarationSyntax> GetNamespaceDeclarationSyntaxes(Compilation compilation)
+        private static IEnumerable<ClassDeclarationSyntax> GetClassDeclarationSyntaxes(Compilation compilation)
         {
             return compilation.SyntaxTrees
                 .Select(syntaxTree => syntaxTree.GetRoot())
                 .SelectMany(root => root.DescendantNodesAndSelf())
-                .OfType<NamespaceDeclarationSyntax>();
+                .OfType<ClassDeclarationSyntax>();
         }
 
-        public Compilation ReplaceNodeInCompilation(Compilation compilation, SyntaxNode node, SyntaxNode newNode)
+        public Compilation InsertNodeInCompilation(Compilation compilation, SyntaxNode node, SyntaxNode newNode)
         {
             var syntaxTree = node.SyntaxTree;
             var root = syntaxTree.GetRoot();
 
-            var newRoot = root.ReplaceNode(node, newNode);
+            var newRoot = root.InsertNodesBefore(node, new[] { newNode });
             var newSyntaxTree = syntaxTree.WithRootAndOptions(newRoot, syntaxTree.Options);
             var newCompilation = compilation.ReplaceSyntaxTree(syntaxTree, newSyntaxTree);
 

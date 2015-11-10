@@ -5,6 +5,8 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace ExpressionViewerTests
 {
@@ -84,13 +86,13 @@ namespace ExpressionViewerTests
             }");
             var result = await searcher.FindTarget(solution);
 
-            Assert.IsTrue(result.Node is NamespaceDeclarationSyntax);
+            Assert.IsTrue(result.Node is ClassDeclarationSyntax);
             Assert.IsNotNull(result.Compilation);
         }
 
 
         [TestMethod]
-        public async Task ReplaceNodeInCompilation_WithOldAndNewNodes_ReturnsNewUpdatedCompilation()
+        public async Task InsertNodeInCompilation_WithOldAndNewNodes_ReturnsNewUpdatedCompilation()
         {
             var searcher = new ExpressionSearcher();
             var solution = SingleFileSolution(@"
@@ -101,11 +103,32 @@ namespace ExpressionViewerTests
                 }
             }");
             var target = await searcher.FindTarget(solution);
-            SyntaxNode newNode = null;
+            SyntaxNode newNode = SyntaxFactory.ClassDeclaration("NewNode");
 
-            var newCompilation = searcher.ReplaceNodeInCompilation(target.Compilation, target.Node, newNode);
+            var newCompilation = searcher.InsertNodeInCompilation(target.Compilation, target.Node, newNode);
 
             Assert.AreNotEqual(target.Compilation, newCompilation);
+        }
+
+        [TestMethod]
+        public async Task InsertNodeInCompilation_WithOldAndNewNodes_LeavesOldClassInPlace()
+        {
+            var searcher = new ExpressionSearcher();
+            var oldClassName = "SimpleClass";
+            var solution = SingleFileSolution(@"
+            namespace " + oldClassName + @" {
+                public class SimpleClass() {
+                    public void Do() {
+                    }
+                }
+            }");
+            var target = await searcher.FindTarget(solution);
+            SyntaxNode newNode = SyntaxFactory.ClassDeclaration("NewNode");
+
+            var newCompilation = searcher.InsertNodeInCompilation(target.Compilation, target.Node, newNode);
+
+            var classes = GetClassDeclarationSyntaxes(newCompilation);
+            Assert.AreEqual(1, classes.Count(classSyntax => classSyntax.Identifier.Text == oldClassName));
         }
 
         private Solution EmptySolution()
@@ -144,6 +167,14 @@ namespace ExpressionViewerTests
             var projectInfo = ProjectInfo.Create(projectId, version, "no name", "assembly.dll", "C#");
 
             return projectInfo;
+        }
+
+        private static IEnumerable<ClassDeclarationSyntax> GetClassDeclarationSyntaxes(Compilation compilation)
+        {
+            return compilation.SyntaxTrees
+                .Select(syntaxTree => syntaxTree.GetRoot())
+                .SelectMany(root => root.DescendantNodesAndSelf())
+                .OfType<ClassDeclarationSyntax>();
         }
     }
 }
