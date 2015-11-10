@@ -65,5 +65,19 @@ namespace ExpressionViewerTests
                 Thread.Sleep(10);
             }
         }
+
+        [TestMethod]
+        public void SourceMonitor_AfterDisposing_DoesntTriggerSourceChanged()
+        {
+            var sourceMonitor = new SourceMonitor(null);
+
+            sourceMonitor.Dispose();
+
+            var changes = 0;
+            sourceMonitor.SourceChanged += (s, e) => changes += 1;
+            var arbitraryWaitTime = 1500;
+            Thread.Sleep(arbitraryWaitTime);
+            Assert.AreEqual(0, changes);
+        }
     }
 }
