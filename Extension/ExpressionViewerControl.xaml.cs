@@ -19,6 +19,8 @@ namespace Extension
     using Microsoft.CodeAnalysis.CSharp;
     using System;
     using System.Windows.Threading;
+    using System.Composition;
+    using Microsoft.VisualStudio.Shell;
 
 
     /// <summary>
@@ -40,6 +42,27 @@ namespace Extension
                {
                    textBox.Text = content;
                }));
+        }
+
+        // Need a cleaner way to initialize this property
+        public static IServiceProvider GlobalServiceProvider { get; set; }
+
+        private void ExpressionViewer_Initialized(object sender, EventArgs e)
+        {
+            Setup(GlobalServiceProvider, this);
+        }
+
+        private void Setup(IServiceProvider serviceProvider, ExpressionViewerControl view)
+        {
+            var sourceMonitor = new SourceMonitor(serviceProvider);
+            var viewController = new ExpressionViewController(view);
+            var viewGenerator = new ViewGenerator();
+            var runner = new Runner(sourceMonitor, viewController, viewGenerator);
+        }
+
+        private void ExpressionViewer_Unloaded(object sender, RoutedEventArgs e)
+        {
+            //TODO
         }
     }
 }

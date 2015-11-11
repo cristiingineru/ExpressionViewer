@@ -9,6 +9,7 @@ namespace Extension
     using System;
     using System.Runtime.InteropServices;
     using Microsoft.VisualStudio.Shell;
+    using System.Composition;
 
     /// <summary>
     /// This class implements the tool window exposed by this package and hosts a user control.
@@ -24,6 +25,9 @@ namespace Extension
     [Guid("0b046503-dc9e-4f16-a73b-78887829301f")]
     public class ExpressionViewer : ToolWindowPane
     {
+        [Import]
+        public SVsServiceProvider ServiceProvider { get; set; }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ExpressionViewer"/> class.
         /// </summary>
