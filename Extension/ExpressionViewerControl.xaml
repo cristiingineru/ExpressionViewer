@@ -9,10 +9,12 @@
              d:DesignHeight="300" d:DesignWidth="300"
              Name="MyToolWindow">
     <Grid>
-        <StackPanel Orientation="Vertical">
-            <TextBlock Margin="10" HorizontalAlignment="Center">ExpressionViewer</TextBlock>
-            <Button Content="Click me!" Click="button1_Click" Width="120" Height="80" Name="button1"/>
-            <TextBox x:Name="textBox" HorizontalAlignment="Left" Height="145" TextWrapping="Wrap" Text="TextBox" Width="300" TextAlignment="Center" FontSize="21.333"/>
-        </StackPanel>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <TextBox x:Name="textBox" Grid.Row="0" Grid.Column="0" TextWrapping="Wrap" TextAlignment="Center" FontSize="21.333" IsReadOnly="True"/>
     </Grid>
 </UserControl>

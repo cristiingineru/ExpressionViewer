@@ -41,20 +41,5 @@ namespace Extension
                    textBox.Text = content;
                }));
         }
-
-        /// <summary>
-        /// Handles click on the button by displaying a message box.
-        /// </summary>
-        /// <param name="sender">The event sender.</param>
-        /// <param name="e">The event args.</param>
-        [SuppressMessage("Microsoft.Globalization", "CA1300:SpecifyMessageBoxOptions", Justification = "Sample code")]
-        [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1300:ElementMustBeginWithUpperCaseLetter", Justification = "Default event handler naming pattern")]
-        private async void button1_Click(object sender, RoutedEventArgs e)
-        {
-            var generator = new ViewGenerator();
-
-            var solutionPath = @"..\..\..\TestSolutions\ManualTesting\ManualTesting.sln";
-            textBox.Text = await generator.GenerateViewAsync(solutionPath);
-        }
     }
 }

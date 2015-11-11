@@ -13,8 +13,7 @@ namespace ManualTesting
             return "Hello!!!"
                 .Split("-")
                 .Insert(0, "<a>")
-                .Append("</a>")
-                .ToString();
+                .Append("</a>");
         }
     }
 
