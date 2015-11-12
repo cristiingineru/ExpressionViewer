@@ -33,10 +33,17 @@ namespace Extension
 
                     var instrumentedDll = Path.Combine(tempDirectory.FullName, Path.GetRandomFileName() + ".dll");
                     var emitResult = newCompilation.Emit(instrumentedDll);
-                    using (var assemblyRunner = new AssemblyRunner())
+                    if (emitResult.Success)
                     {
-                        var result = assemblyRunner.Run(instrumentedDll, "WrapperClass", "WrapperMethod");
-                        view = result;
+                        using (var assemblyRunner = new AssemblyRunner())
+                        {
+                            var result = assemblyRunner.Run(instrumentedDll, "WrapperClass", "WrapperMethod");
+                            view = result;
+                        }
+                    }
+                    else
+                    {
+                        view = string.Join(Environment.NewLine, emitResult.Diagnostics);
                     }
                 }
                 catch (Exception exception)

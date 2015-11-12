@@ -34,7 +34,7 @@ namespace ExpressionViewerTests
         }
 
         [TestMethod]
-        public async Task ViewGenerator_WithSolutionWithCompileError_DoesntReturnView()
+        public async Task ViewGenerator_WithSolutionWithCompileError_DoesntReturnValidView()
         {
             var generator = new ViewGenerator();
 
@@ -42,6 +42,17 @@ namespace ExpressionViewerTests
             var view = await generator.GenerateViewAsync(solutionPath);
 
             Assert.IsFalse(IsValidView(view));
+        }
+
+        [TestMethod]
+        public async Task ViewGenerator_WithSolutionWithCompileError_ReturnsEmitError()
+        {
+            var generator = new ViewGenerator();
+
+            var solutionPath = SolutionWithCompileErrorPath();
+            var view = await generator.GenerateViewAsync(solutionPath);
+
+            Assert.IsTrue(view.Contains("error CS1002"));
         }
 
         /// <summary>
