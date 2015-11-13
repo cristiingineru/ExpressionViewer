@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Extension")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("ExpressionViewer")]
+[assembly: AssemblyDescription("Roslyn based Visual Studio extension for evaluating C# expressions at edit time")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Extension")]
+[assembly: AssemblyProduct("ExpressionViewer")]
 [assembly: AssemblyCopyright("")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
