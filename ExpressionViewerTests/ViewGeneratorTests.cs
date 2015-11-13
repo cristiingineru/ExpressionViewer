@@ -55,6 +55,17 @@ namespace ExpressionViewerTests
             Assert.IsTrue(view.Contains("error CS1002"));
         }
 
+        [TestMethod]
+        public async Task ViewGenerator_WithConsoleApplicationSolution_ReturnsView()
+        {
+            var generator = new ViewGenerator();
+
+            var solutionPath = ConsoleApplicationSolutionPath();
+            var view = await generator.GenerateViewAsync(solutionPath);
+
+            Assert.IsTrue(IsValidView(view));
+        }
+
         /// <summary>
         /// This message needs to be present in any valid view returned by the generator.
         /// </summary>
@@ -74,6 +85,11 @@ namespace ExpressionViewerTests
         private string SolutionWithCompileErrorPath()
         {
             return @"..\..\..\TestSolutions\SolutionWithCompileError\SolutionWithCompileError.sln";
+        }
+
+        private string ConsoleApplicationSolutionPath()
+        {
+            return @"..\..\..\TestSolutions\ConsoleApplicationSolution\ConsoleApplicationSolution.sln";
         }
     }
 }
