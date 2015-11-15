@@ -5,7 +5,9 @@ Visual Studio extension for evaluating expressions at edit time
 
 
 # How to play with it
-TBD
+1. Install Visual Studio 2015 Comunity
+2. Tools -> Extensions and Updates... -> Online -> search for "expression viewer"
+  * or look in the Visual Studio galery: https://visualstudiogallery.msdn.microsoft.com/9e4feaed-0365-49ef-905a-66bd0e414618
 
 # How to extend it
 1. Install Visual Studio 2015 Comunity
