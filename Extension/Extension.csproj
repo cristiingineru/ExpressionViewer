@@ -78,7 +78,10 @@
     </VSCTCompile>
     <Content Include="index.html" />
     <Content Include="Resources\ExpressionViewerCommand.png" />
-    <Content Include="Resources\ExpressionViewerPackage.ico" />
+    <Content Include="Resources\ExpressionViewerPackage.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Content Include="stylesheet.css" />
   </ItemGroup>
   <ItemGroup>
