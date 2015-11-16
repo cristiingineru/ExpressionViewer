@@ -35,11 +35,13 @@ namespace Extension
         public SourceMonitor(IServiceProvider serviceProvider)
         {
             Timer = new Timer(1000);
+            Timer.AutoReset = false;
             Timer.Elapsed += (sender, args) =>
             {
                 var solutionFullName = GetSolutionFullName(serviceProvider);
                 var arguments = new SourceMonitorArgs(solutionFullName);
                 SourceChanged(this, arguments);
+                Timer.Start();
             };
             Timer.Start();
         }

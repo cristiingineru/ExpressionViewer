@@ -88,38 +88,67 @@ namespace ExpressionViewerTests
         [TestMethod]
         public void SourceMonitor_Object_IsDisposable()
         {
-            var sourceMonitor = new SourceMonitor(null);
-
-            Assert.IsTrue(sourceMonitor is IDisposable);
+            using (var sourceMonitor = new SourceMonitor(null))
+            {
+                Assert.IsTrue(sourceMonitor is IDisposable);
+            }
         }
 
         [TestMethod]
         public void SourceMonitor_FromTimeToTime_TriggerSourceChanged()
         {
-            var sourceMonitor = new SourceMonitor(null);
-
-            var changes = 0;
-            sourceMonitor.SourceChanged += (s, e) => changes += 1;
-
-            var arbitraryExpectedChanges = 3;
-            while (changes < arbitraryExpectedChanges)
+            using (var sourceMonitor = new SourceMonitor(null))
             {
-                Thread.Sleep(10);
+                var changes = 0;
+                sourceMonitor.SourceChanged += (s, e) => changes += 1;
+
+                var arbitraryExpectedChanges = 3;
+                while (changes < arbitraryExpectedChanges)
+                {
+                    Thread.Sleep(10);
+                }
+            }
+        }
+
+        [TestMethod]
+        public void SourceMonitor_WhilePreviouseNotificationInProgress_ItWaits()
+        {
+            using (var sourceMonitor = new SourceMonitor(null))
+            {
+                var longHandlerEvent = new AutoResetEvent(false);
+                var sourceChangedEvent = new AutoResetEvent(false);
+
+                var changes = 0;
+                sourceMonitor.SourceChanged += (s, e) =>
+                {
+                    // this is happening in a different thread
+                    changes += 1;
+                    sourceChangedEvent.Set();
+                    longHandlerEvent.WaitOne();
+                };
+
+                sourceChangedEvent.WaitOne();
+                var longTimeRequiredToProcessTheEvent = 3000;
+                Thread.Sleep(longTimeRequiredToProcessTheEvent);
+                longHandlerEvent.Set();
+
+                Assert.AreEqual(1, changes);
             }
         }
 
         [TestMethod]
         public void SourceMonitor_AfterDisposing_DoesntTriggerSourceChanged()
         {
-            var sourceMonitor = new SourceMonitor(null);
+            using (var sourceMonitor = new SourceMonitor(null))
+            {
+                sourceMonitor.Dispose();
 
-            sourceMonitor.Dispose();
-
-            var changes = 0;
-            sourceMonitor.SourceChanged += (s, e) => changes += 1;
-            var arbitraryWaitTime = 1500;
-            Thread.Sleep(arbitraryWaitTime);
-            Assert.AreEqual(0, changes);
+                var changes = 0;
+                sourceMonitor.SourceChanged += (s, e) => changes += 1;
+                var arbitraryWaitTime = 1500;
+                Thread.Sleep(arbitraryWaitTime);
+                Assert.AreEqual(0, changes);
+            }
         }
     }
 }
