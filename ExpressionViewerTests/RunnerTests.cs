@@ -32,6 +32,48 @@ namespace ExpressionViewerTests
         }
 
         [TestMethod]
+        public void Runner_Object_IsDisposable()
+        {
+            var sourceMonitor = new Mock<ISourceMonitor>();
+            var viewController = new Mock<IViewController>();
+            var viewGenerator = new Mock<IViewGenerator>(MockBehavior.Loose);
+            var runner = new Runner(sourceMonitor.Object, viewController.Object, viewGenerator.Object);
+
+            Assert.IsTrue(runner is IDisposable);
+        }
+
+        [TestMethod]
+        public void Runner_CallingDispose_SourceChangedDoesntTriggerDrawView()
+        {
+            var sourceMonitor = new Mock<ISourceMonitor>(MockBehavior.Loose);
+            var viewController = new Mock<IViewController>(MockBehavior.Loose);
+            var solution = "solution.sln";
+            var content = "content";
+            var viewGenerator = new Mock<IViewGenerator>(MockBehavior.Loose);
+            viewGenerator
+                .Setup(generator => generator.GenerateViewAsync(solution))
+                .Returns(Task.FromResult(content));
+            var runner = new Runner(sourceMonitor.Object, viewController.Object, viewGenerator.Object);
+
+            runner.Dispose();
+
+            sourceMonitor.Raise(mock => mock.SourceChanged += null, new SourceMonitorArgs(solution));
+            viewController.Verify(mock => mock.Draw(content), Times.Never());
+        }
+
+        [TestMethod]
+        public void Runner_CallingDisposeTwice_DoesntFail()
+        {
+            var sourceMonitor = new Mock<ISourceMonitor>();
+            var viewController = new Mock<IViewController>();
+            var viewGenerator = new Mock<IViewGenerator>(MockBehavior.Loose);
+            var runner = new Runner(sourceMonitor.Object, viewController.Object, viewGenerator.Object);
+
+            runner.Dispose();
+            runner.Dispose();
+        }
+
+        [TestMethod]
         public void ViewDrawer_Draw_UpdateView()
         {
             var view = new Mock<IView>(MockBehavior.Loose);

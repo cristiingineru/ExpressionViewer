@@ -44,14 +44,24 @@ namespace Extension
                }));
         }
 
-        // Need a cleaner way to initialize this property
-        public static IServiceProvider GlobalServiceProvider { get; set; }
-
-        private void ExpressionViewer_Initialized(object sender, EventArgs e)
+        private void ExpressionViewer_Loaded(object sender, RoutedEventArgs e)
         {
             Setup(GlobalServiceProvider, this);
         }
 
+        private void ExpressionViewer_Unloaded(object sender, RoutedEventArgs e)
+        {
+            Finish();
+        }
+
+        // Need a cleaner way to initialize this property
+        public static IServiceProvider GlobalServiceProvider { get; set; }
+
+        private Runner Runner { get ; set; }
+
+        /// <summary>
+        /// Needs to be called everytime the control is made visible
+        /// </summary>
         private void Setup(IServiceProvider serviceProvider, ExpressionViewerControl view)
         {
             var sourceMonitor = new SourceMonitor(serviceProvider);
@@ -60,9 +70,16 @@ namespace Extension
             var runner = new Runner(sourceMonitor, viewController, viewGenerator);
         }
 
-        private void ExpressionViewer_Unloaded(object sender, RoutedEventArgs e)
+        /// <summary>
+        /// Needs to be called everythime the control is hidden
+        /// </summary>
+        private void Finish()
         {
-            //TODO
+            if (Runner != null)
+            {
+                Runner.Dispose();
+                Runner = null;
+            }
         }
     }
 }

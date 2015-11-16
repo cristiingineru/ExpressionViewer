@@ -100,7 +100,7 @@ namespace Extension
         }
     }
 
-    public class Runner
+    public class Runner : IDisposable
     {
         public ISourceMonitor SourceMonitor { get; private set; }
         public IViewController ViewController { get; private set; }
@@ -111,12 +111,25 @@ namespace Extension
             ViewController = viewController;
             ViewGenerator = viewGenerator;
 
-            SourceMonitor.SourceChanged += async (s, e) =>
-            {
-                var arguments = e as SourceMonitorArgs;
-                var content = await viewGenerator.GenerateViewAsync(arguments.Solution);
-                ViewController.Draw(content);
-            };
+            SourceMonitor.SourceChanged += SourceMonitor_SourceChanged;
         }
+
+        public void Dispose()
+        {
+            if (disposed == false)
+            {
+                SourceMonitor.SourceChanged -= SourceMonitor_SourceChanged;
+                disposed = true;
+            }
+        }
+
+        private async void SourceMonitor_SourceChanged(object sender, EventArgs e)
+        {
+            var arguments = e as SourceMonitorArgs;
+            var content = await ViewGenerator.GenerateViewAsync(arguments.Solution);
+            ViewController.Draw(content);
+        }
+
+        private bool disposed = false;
     }
 }
