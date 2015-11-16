@@ -22,9 +22,11 @@ namespace Extension
     public class SourceMonitorArgs : EventArgs
     {
         public string Solution { get; internal set; }
-        public SourceMonitorArgs(string solution)
+        public string ActiveDocument { get; internal set; }
+        public SourceMonitorArgs(string solution, string activeDocument)
         {
             this.Solution = solution;
+            this.ActiveDocument = activeDocument;
         }
     }
 
@@ -39,7 +41,8 @@ namespace Extension
             Timer.Elapsed += (sender, args) =>
             {
                 var solutionFullName = GetSolutionFullName(serviceProvider);
-                var arguments = new SourceMonitorArgs(solutionFullName);
+                var activeDocument = GetActiveDocument(serviceProvider);
+                var arguments = new SourceMonitorArgs(solutionFullName, activeDocument);
                 SourceChanged(this, arguments);
                 Timer.Start();
             };
@@ -62,6 +65,24 @@ namespace Extension
                 }
             }
             return solutionFullName;
+        }
+
+        private string GetActiveDocument(IServiceProvider serviceProvider)
+        {
+            var activeDocumentFullName = String.Empty;
+            if (serviceProvider != null)
+            {
+                var dte = (DTE)serviceProvider.GetService(typeof(DTE));
+                if (dte != null)
+                {
+                    var document = dte.ActiveDocument;
+                    if (document != null)
+                    {
+                        activeDocumentFullName = document.FullName;
+                    }
+                }
+            }
+            return activeDocumentFullName;
         }
 
         public void Dispose()
