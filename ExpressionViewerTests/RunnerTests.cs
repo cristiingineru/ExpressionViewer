@@ -152,5 +152,15 @@ namespace ExpressionViewerTests
                 Assert.AreEqual(0, changes);
             }
         }
+
+        [TestMethod]
+        public void SourceMonitor_WithNoHandler_DoesntFail()
+        {
+            using (var sourceMonitor = new SourceMonitor(null))
+            {
+                var arbitraryWaitTime = 2000;
+                Thread.Sleep(arbitraryWaitTime);
+            }
+        }
     }
 }

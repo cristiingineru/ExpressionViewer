@@ -67,7 +67,7 @@ namespace Extension
             var sourceMonitor = new SourceMonitor(serviceProvider);
             var viewController = new ExpressionViewController(view);
             var viewGenerator = new ViewGenerator();
-            var runner = new Runner(sourceMonitor, viewController, viewGenerator);
+            Runner = new Runner(sourceMonitor, viewController, viewGenerator);
         }
 
         /// <summary>
