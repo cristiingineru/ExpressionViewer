@@ -106,6 +106,9 @@ namespace Extension
     {
         public static bool SameFile(string fileName1, string fileName2)
         {
+            fileName1 = fileName1.ToUpperInvariant();
+            fileName2 = fileName2.ToUpperInvariant();
+
             return fileName1 == fileName2 ||
                 fileName1 == Path.GetFileName(fileName2) ||
                 Path.GetFileName(fileName1) == fileName2;

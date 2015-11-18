@@ -236,6 +236,16 @@ namespace ExpressionViewerTests
             Assert.IsFalse(result);
         }
 
+        [TestMethod]
+        public void SameFile_FileNameVsSameFileNameDifferentCase_ReturnsTrue()
+        {
+            var result = FileNameComparer.SameFile(
+                fileName1: "file.txt",
+                fileName2: "FiLe.TxT");
+
+            Assert.IsTrue(result);
+        }
+
         private Solution EmptySolution()
         {
             var id = SolutionId.CreateNewId();

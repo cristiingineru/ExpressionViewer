@@ -11,15 +11,10 @@ namespace ManualTesting
     {
         public string SecondSimpleMethod()
         {
-            return "Hello!!!"
+            return "Ciao!!!"
                 .Split("-")
                 .Insert(0, "<a>")
                 .Append("</a>");
-        }
-
-        private void UsingRequired()
-        {
-            var x = Directory.Exists("a.txt");
         }
     }
 }
