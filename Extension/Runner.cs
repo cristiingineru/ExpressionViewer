@@ -11,7 +11,7 @@ namespace Extension
 {
     public interface IViewGenerator
     {
-        Task<string> GenerateViewAsync(string solutionPath);
+        Task<string> GenerateViewAsync(string solutionPath, string activeDocument);
     }
 
     public interface ISourceMonitor
@@ -152,7 +152,7 @@ namespace Extension
         private async void SourceMonitor_SourceChanged(object sender, EventArgs e)
         {
             var arguments = e as SourceMonitorArgs;
-            var content = await ViewGenerator.GenerateViewAsync(arguments.Solution);
+            var content = await ViewGenerator.GenerateViewAsync(arguments.Solution, arguments.ActiveDocument);
             ViewController.Draw(content);
         }
 

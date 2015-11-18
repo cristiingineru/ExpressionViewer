@@ -35,6 +35,30 @@ namespace ExpressionViewerTests
         }
 
         [TestMethod]
+        public async Task FindSource_WithInvalidFileName_ReturnsNoValue()
+        {
+            var searcher = new ExpressionSearcher();
+
+            var solution = DefaultSolution();
+            var activeDocument = InvalidActiveDocument();
+            var result = await searcher.FindSource(solution, activeDocument);
+
+            Assert.IsNull(result);
+        }
+
+        [TestMethod]
+        public async Task FindSource_WithWrongFileName_ReturnsNoValue()
+        {
+            var searcher = new ExpressionSearcher();
+
+            var solution = DefaultSolution();
+            var activeDocument = WrongActiveDocument();
+            var result = await searcher.FindSource(solution, activeDocument);
+
+            Assert.IsNull(result);
+        }
+
+        [TestMethod]
         public async Task FindSource_WithExpressionWithinMethod_ReturnsTheExpression()
         {
             var searcher = new ExpressionSearcher();
@@ -44,7 +68,8 @@ namespace ExpressionViewerTests
             public void Do() {
                 var result = " + expression + @";
             }");
-            var result = await searcher.FindSource(solution);
+            var activeDocument = DefaultActiveDocument();
+            var result = await searcher.FindSource(solution, activeDocument);
 
             Assert.AreEqual(expression, result.GetText().ToString());
         }
@@ -131,6 +156,86 @@ namespace ExpressionViewerTests
             Assert.AreEqual(1, classes.Count(classSyntax => classSyntax.Identifier.Text == oldClassName));
         }
 
+        [TestMethod]
+        public void SameFile_FileNameVsSameFileName_ReturnsTrue()
+        {
+            var result = FileNameComparer.SameFile(
+                fileName1: "file.txt",
+                fileName2: "file.txt");
+
+            Assert.IsTrue(result);
+        }
+
+        [TestMethod]
+        public void SameFile_FileNameVsDifferentFileName_ReturnsFalse()
+        {
+            var result = FileNameComparer.SameFile(
+                fileName1: "file1.txt",
+                fileName2: "file2.txt");
+
+            Assert.IsFalse(result);
+        }
+
+        [TestMethod]
+        public void SameFile_FullFileNameVsSameFileName_ReturnsTrue()
+        {
+            var result = FileNameComparer.SameFile(
+                fileName1: "d:\\folder\\file.txt",
+                fileName2: "file.txt");
+
+            Assert.IsTrue(result);
+        }
+
+        [TestMethod]
+        public void SameFile_FullFileNameVsDifferentFileName_ReturnsFalse()
+        {
+            var result = FileNameComparer.SameFile(
+                fileName1: "d:\\folder\\file1.txt",
+                fileName2: "file2.txt");
+
+            Assert.IsFalse(result);
+        }
+
+        [TestMethod]
+        public void SameFile_FullFileNameVsSameFullFileName_ReturnsTrue()
+        {
+            var result = FileNameComparer.SameFile(
+                fileName1: "d:\\folder\\file.txt",
+                fileName2: "d:\\folder\\file.txt");
+
+            Assert.IsTrue(result);
+        }
+
+        [TestMethod]
+        public void SameFile_FullFileNameVsDifferentFullFileName_ReturnsFalse()
+        {
+            var result = FileNameComparer.SameFile(
+                fileName1: "d:\\folder\\file1.txt",
+                fileName2: "d:\\folder\\file2.txt");
+
+            Assert.IsFalse(result);
+        }
+
+        [TestMethod]
+        public void SameFile_FileNameVsSameFullFileName_ReturnsTrue()
+        {
+            var result = FileNameComparer.SameFile(
+                fileName1: "file.txt",
+                fileName2: "d:\\folder\\file.txt");
+
+            Assert.IsTrue(result);
+        }
+
+        [TestMethod]
+        public void SameFile_FileNameVsDifferentFullFileName_ReturnsFalse()
+        {
+            var result = FileNameComparer.SameFile(
+                fileName1: "file1.txt",
+                fileName2: "d:\\folder\\file2.txt");
+
+            Assert.IsFalse(result);
+        }
+
         private Solution EmptySolution()
         {
             var id = SolutionId.CreateNewId();
@@ -140,6 +245,21 @@ namespace ExpressionViewerTests
             var solution = workspace.AddSolution(solutionInfo);
 
             return solution;
+        }
+
+        private Solution DefaultSolution()
+        {
+            var defaultContent = @"
+            namespace SimpleNamespace {
+                public class SimpleClass() {
+                    public void Do() {
+                        var x = ""text"".ToString().ToString();
+                    }
+                }
+            }";
+            var defaultSolution = SingleFileSolution(defaultContent);
+
+            return defaultSolution;
         }
 
         private Solution SingleFileSolution(string fileContent)
@@ -156,7 +276,8 @@ namespace ExpressionViewerTests
             var project = solution.GetProject(projectId);
 
             var root = CSharpSyntaxTree.ParseText(fileContent).GetRoot();
-            var document = project.AddDocument("file.cs", root);
+            var documentName = DefaultActiveDocument();
+            var document = project.AddDocument(documentName, root);
 
             return document.Project.Solution;
         }
@@ -175,6 +296,21 @@ namespace ExpressionViewerTests
                 .Select(syntaxTree => syntaxTree.GetRoot())
                 .SelectMany(root => root.DescendantNodesAndSelf())
                 .OfType<ClassDeclarationSyntax>();
+        }
+
+        private string InvalidActiveDocument()
+        {
+            return String.Empty;
+        }
+
+        private string DefaultActiveDocument()
+        {
+            return "file.cs";
+        }
+
+        private string WrongActiveDocument()
+        {
+            return "noSuchFileAsThis.cs";
         }
     }
 }

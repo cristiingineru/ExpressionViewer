@@ -23,7 +23,7 @@ namespace ExpressionViewerTests
             var content = "content";
             var viewGenerator = new Mock<IViewGenerator>(MockBehavior.Loose);
             viewGenerator
-                .Setup(generator => generator.GenerateViewAsync(solution))
+                .Setup(generator => generator.GenerateViewAsync(solution, activeDocument))
                 .Returns(Task.FromResult(content));
             var runner = new Runner(sourceMonitor.Object, viewController.Object, viewGenerator.Object);
 
@@ -53,7 +53,7 @@ namespace ExpressionViewerTests
             var content = "content";
             var viewGenerator = new Mock<IViewGenerator>(MockBehavior.Loose);
             viewGenerator
-                .Setup(generator => generator.GenerateViewAsync(solution))
+                .Setup(generator => generator.GenerateViewAsync(solution, activeDocument))
                 .Returns(Task.FromResult(content));
             var runner = new Runner(sourceMonitor.Object, viewController.Object, viewGenerator.Object);
 
