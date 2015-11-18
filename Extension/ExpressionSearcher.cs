@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,9 +11,9 @@ namespace Extension
 {
     public class ExpressionSearcher
     {
-        public async Task<SyntaxNode> FindSource(Solution solution)
+        public async Task<SyntaxNode> FindSource(Solution solution, string activeDocument = null)
         {
-            if (solution == null)
+            if (solution == null || string.IsNullOrEmpty(activeDocument))
             {
                 return null;
             }
@@ -25,7 +26,7 @@ namespace Extension
                     return compilation;
                 });
 
-            foreach(var task in compilationTasks)
+            foreach (var task in compilationTasks)
             {
                 task.Wait();
             }
@@ -33,12 +34,13 @@ namespace Extension
             var invocationExpressions = compilationTasks
                 .Select(task => task.Result)
                 .SelectMany(compilation => compilation.SyntaxTrees)
+                .Where(compilation => FileNameComparer.SameFile(compilation.FilePath, activeDocument))
                 .Select(syntaxTree => syntaxTree.GetRoot())
                 .SelectMany(root => root.DescendantNodesAndSelf())
                 .Where(syntaxNode => syntaxNode.IsKind(Microsoft.CodeAnalysis.CSharp.SyntaxKind.MethodDeclaration))
                 .SelectMany(methodDeclaration => methodDeclaration.DescendantNodesAndSelf())
                 .Where(syntaxNode => syntaxNode.IsKind(Microsoft.CodeAnalysis.CSharp.SyntaxKind.InvocationExpression));
-            
+
             SyntaxNode foundInvocationExpression = null;
             if (invocationExpressions.Any())
             {
@@ -69,7 +71,7 @@ namespace Extension
                 })
                 .Select(compilationTask => compilationTask.Result)
                 .Where(compilation => GetClassDeclarationSyntaxes(compilation).Any())
-                .Select(compilation => new Target() { Compilation = compilation, Node = GetClassDeclarationSyntaxes(compilation).First() } );
+                .Select(compilation => new Target() { Compilation = compilation, Node = GetClassDeclarationSyntaxes(compilation).First() });
 
             var foundNamespaceDeclarationSyntax = new Target();
             if (classDeclarationSyntaxes.Any())
@@ -97,6 +99,19 @@ namespace Extension
             var newCompilation = compilation.ReplaceSyntaxTree(syntaxTree, newSyntaxTree);
 
             return newCompilation;
+        }
+    }
+
+    public static class FileNameComparer
+    {
+        public static bool SameFile(string fileName1, string fileName2)
+        {
+            fileName1 = fileName1.ToUpperInvariant();
+            fileName2 = fileName2.ToUpperInvariant();
+
+            return fileName1 == fileName2 ||
+                fileName1 == Path.GetFileName(fileName2) ||
+                Path.GetFileName(fileName1) == fileName2;
         }
     }
 }

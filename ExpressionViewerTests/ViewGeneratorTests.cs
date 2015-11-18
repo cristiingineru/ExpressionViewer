@@ -28,7 +28,8 @@ namespace ExpressionViewerTests
             var generator = new ViewGenerator();
 
             var solutionPath = ValidSolutionPath();
-            var view = await generator.GenerateViewAsync(solutionPath);
+            var activeDocument = "SimpleClass.cs";
+            var view = await generator.GenerateViewAsync(solutionPath, activeDocument);
 
             Assert.IsTrue(IsValidView(view));
         }
@@ -61,7 +62,8 @@ namespace ExpressionViewerTests
             var generator = new ViewGenerator();
 
             var solutionPath = ConsoleApplicationSolutionPath();
-            var view = await generator.GenerateViewAsync(solutionPath);
+            var activeDocument = "Program.cs";
+            var view = await generator.GenerateViewAsync(solutionPath, activeDocument);
 
             Assert.IsTrue(IsValidView(view));
         }

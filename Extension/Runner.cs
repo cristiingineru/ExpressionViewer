@@ -11,7 +11,7 @@ namespace Extension
 {
     public interface IViewGenerator
     {
-        Task<string> GenerateViewAsync(string solutionPath);
+        Task<string> GenerateViewAsync(string solutionPath, string activeDocument);
     }
 
     public interface ISourceMonitor
@@ -22,9 +22,11 @@ namespace Extension
     public class SourceMonitorArgs : EventArgs
     {
         public string Solution { get; internal set; }
-        public SourceMonitorArgs(string solution)
+        public string ActiveDocument { get; internal set; }
+        public SourceMonitorArgs(string solution, string activeDocument)
         {
             this.Solution = solution;
+            this.ActiveDocument = activeDocument;
         }
     }
 
@@ -35,11 +37,17 @@ namespace Extension
         public SourceMonitor(IServiceProvider serviceProvider)
         {
             Timer = new Timer(1000);
+            Timer.AutoReset = false;
             Timer.Elapsed += (sender, args) =>
             {
                 var solutionFullName = GetSolutionFullName(serviceProvider);
-                var arguments = new SourceMonitorArgs(solutionFullName);
-                SourceChanged(this, arguments);
+                var activeDocument = GetActiveDocument(serviceProvider);
+                var arguments = new SourceMonitorArgs(solutionFullName, activeDocument);
+                if (SourceChanged != null)
+                {
+                    SourceChanged(this, arguments);
+                }
+                Timer.Start();
             };
             Timer.Start();
         }
@@ -60,6 +68,24 @@ namespace Extension
                 }
             }
             return solutionFullName;
+        }
+
+        private string GetActiveDocument(IServiceProvider serviceProvider)
+        {
+            var activeDocumentFullName = String.Empty;
+            if (serviceProvider != null)
+            {
+                var dte = (DTE)serviceProvider.GetService(typeof(DTE));
+                if (dte != null)
+                {
+                    var document = dte.ActiveDocument;
+                    if (document != null)
+                    {
+                        activeDocumentFullName = document.FullName;
+                    }
+                }
+            }
+            return activeDocumentFullName;
         }
 
         public void Dispose()
@@ -100,7 +126,7 @@ namespace Extension
         }
     }
 
-    public class Runner
+    public class Runner : IDisposable
     {
         public ISourceMonitor SourceMonitor { get; private set; }
         public IViewController ViewController { get; private set; }
@@ -111,12 +137,25 @@ namespace Extension
             ViewController = viewController;
             ViewGenerator = viewGenerator;
 
-            SourceMonitor.SourceChanged += async (s, e) =>
-            {
-                var arguments = e as SourceMonitorArgs;
-                var content = await viewGenerator.GenerateViewAsync(arguments.Solution);
-                ViewController.Draw(content);
-            };
+            SourceMonitor.SourceChanged += SourceMonitor_SourceChanged;
         }
+
+        public void Dispose()
+        {
+            if (disposed == false)
+            {
+                SourceMonitor.SourceChanged -= SourceMonitor_SourceChanged;
+                disposed = true;
+            }
+        }
+
+        private async void SourceMonitor_SourceChanged(object sender, EventArgs e)
+        {
+            var arguments = e as SourceMonitorArgs;
+            var content = await ViewGenerator.GenerateViewAsync(arguments.Solution, arguments.ActiveDocument);
+            ViewController.Draw(content);
+        }
+
+        private bool disposed = false;
     }
 }
