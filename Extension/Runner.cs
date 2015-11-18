@@ -43,7 +43,7 @@ namespace Extension
                 var solutionFullName = GetSolutionFullName(serviceProvider);
                 var activeDocument = GetActiveDocument(serviceProvider);
                 var arguments = new SourceMonitorArgs(solutionFullName, activeDocument);
-                //if (SourceChanged != null)
+                if (SourceChanged != null)
                 {
                     SourceChanged(this, arguments);
                 }
