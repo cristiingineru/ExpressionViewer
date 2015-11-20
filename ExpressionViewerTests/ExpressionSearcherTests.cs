@@ -18,7 +18,8 @@ namespace ExpressionViewerTests
         {
             var searcher = new ExpressionSearcher();
 
-            var result = await searcher.FindSource(null);
+            var activeDocument = DefaultActiveDocument();
+            var result = await searcher.FindSource(null, activeDocument);
 
             Assert.IsNull(result);
         }
@@ -29,7 +30,8 @@ namespace ExpressionViewerTests
             var searcher = new ExpressionSearcher();
 
             var solution = EmptySolution();
-            var result = await searcher.FindSource(solution);
+            var activeDocument = DefaultActiveDocument();
+            var result = await searcher.FindSource(solution, activeDocument);
 
             Assert.IsNull(result);
         }
