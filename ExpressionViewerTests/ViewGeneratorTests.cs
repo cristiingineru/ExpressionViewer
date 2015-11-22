@@ -16,8 +16,8 @@ namespace ExpressionViewerTests
         {
             var generator = new ViewGenerator();
 
-            var solutionPath = @"drive:\folder\solution.sln";
-            var view = await generator.GenerateViewAsync(solutionPath);
+            var view = await generator.GenerateViewAsync(
+                solutionPath: InvalidSolutionPath());
 
             Assert.IsFalse(IsValidView(view));
         }
@@ -27,9 +27,10 @@ namespace ExpressionViewerTests
         {
             var generator = new ViewGenerator();
 
-            var solutionPath = ValidSolutionPath();
-            var activeDocument = "SimpleClass.cs";
-            var view = await generator.GenerateViewAsync(solutionPath, activeDocument);
+            var view = await generator.GenerateViewAsync(
+                solutionPath: ClassLibrarySolutionPath(),
+                activeDocument: "SimpleClass.cs",
+                cursorPosition: 350);
 
             Assert.IsTrue(IsValidView(view));
         }
@@ -39,8 +40,8 @@ namespace ExpressionViewerTests
         {
             var generator = new ViewGenerator();
 
-            var solutionPath = SolutionWithCompileErrorPath();
-            var view = await generator.GenerateViewAsync(solutionPath);
+            var view = await generator.GenerateViewAsync(
+                solutionPath: SolutionWithCompileErrorPath());
 
             Assert.IsFalse(IsValidView(view));
         }
@@ -50,8 +51,8 @@ namespace ExpressionViewerTests
         {
             var generator = new ViewGenerator();
 
-            var solutionPath = SolutionWithCompileErrorPath();
-            var view = await generator.GenerateViewAsync(solutionPath);
+            var view = await generator.GenerateViewAsync(
+                solutionPath: SolutionWithCompileErrorPath());
 
             Assert.IsTrue(view.Contains("error CS1002"));
         }
@@ -61,9 +62,10 @@ namespace ExpressionViewerTests
         {
             var generator = new ViewGenerator();
 
-            var solutionPath = ConsoleApplicationSolutionPath();
-            var activeDocument = "Program.cs";
-            var view = await generator.GenerateViewAsync(solutionPath, activeDocument);
+            var view = await generator.GenerateViewAsync(
+                solutionPath: ConsoleApplicationSolutionPath(),
+                activeDocument: "Program.cs",
+                cursorPosition: 350);
 
             Assert.IsTrue(IsValidView(view));
         }
@@ -79,7 +81,12 @@ namespace ExpressionViewerTests
             return view.Contains(ItsWorkingWelcomeMessage);
         }
 
-        private string ValidSolutionPath()
+        private string InvalidSolutionPath()
+        {
+            return @"drive:\folder\solution.sln";
+        }
+
+        private string ClassLibrarySolutionPath()
         {
             return @"..\..\..\TestSolutions\ValidSolution\ValidSolution.sln";
         }

@@ -79,7 +79,7 @@ namespace ExpressionViewerTests
         }
 
         [TestMethod]
-        public async Task FindSource_WithExpressionWithinMethod_ReturnsTheExpression()
+        public async Task FindSource_WithDefaultParameters_ReturnsTheExpression()
         {
             var searcher = new ExpressionSearcher();
 
@@ -92,9 +92,49 @@ namespace ExpressionViewerTests
             var result = await searcher.FindSource(
                 solution: SingleFileSolution(file),
                 activeDocument: DefaultActiveDocument(),
-                cursorPosition: expression.IndexOf(expression) + 1);
+                cursorPosition: file.IndexOf(expression));
 
             Assert.AreEqual(expression, result.GetText().ToString());
+        }
+
+        [TestMethod]
+        public async Task FindSource_WithBadCursorPosition_ReturnsNoValue()
+        {
+            var searcher = new ExpressionSearcher();
+
+            var expression = "\"text\".ToString().ToString()";
+            var file = @"
+            public void Do() {
+                var result = " + expression + @";
+            }";
+            var activeDocument = DefaultActiveDocument();
+            var result = await searcher.FindSource(
+                solution: SingleFileSolution(file),
+                activeDocument: DefaultActiveDocument(),
+                cursorPosition: file.IndexOf(expression) - 1);
+
+            Assert.IsNull(result);
+        }
+
+        [TestMethod]
+        public async Task FindSource_WithTwoExpressions_ReturnsTheRequestedExpression()
+        {
+            var searcher = new ExpressionSearcher();
+
+            var expression1 = "\"text1\".ToString().ToString()";
+            var expression2 = "\"text2\".ToString().ToString()";
+            var file = @"
+            public void Do() {
+                var result1 = " + expression1 + @";
+                var result2 = " + expression2 + @";
+            }";
+            var activeDocument = DefaultActiveDocument();
+            var result = await searcher.FindSource(
+                solution: SingleFileSolution(file),
+                activeDocument: DefaultActiveDocument(),
+                cursorPosition: file.IndexOf(expression2));
+
+            Assert.AreEqual(expression2, result.GetText().ToString());
         }
 
         [TestMethod]

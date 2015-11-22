@@ -11,7 +11,7 @@ namespace Extension
 {
     public class ViewGenerator : IViewGenerator
     {
-        public async Task<string> GenerateViewAsync(string solutionPath, string activeDocument = null)
+        public async Task<string> GenerateViewAsync(string solutionPath, string activeDocument = null, int cursorPosition = -1)
         {
             var view = string.Empty;
 
@@ -25,7 +25,7 @@ namespace Extension
 
                     var expressionSearcher = new ExpressionSearcher();
                     var expressionBuilder = new ExpressionBuilder();
-                    var source = await expressionSearcher.FindSource(newSolution, activeDocument);
+                    var source = await expressionSearcher.FindSource(newSolution, activeDocument, cursorPosition);
                     var target = await expressionSearcher.FindTarget(newSolution);
                     var instrumentation = await expressionBuilder.BuildWrapper(source);
 

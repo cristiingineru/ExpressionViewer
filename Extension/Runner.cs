@@ -11,7 +11,7 @@ namespace Extension
 {
     public interface IViewGenerator
     {
-        Task<string> GenerateViewAsync(string solutionPath, string activeDocument);
+        Task<string> GenerateViewAsync(string solutionPath, string activeDocument, int cursorPosition);
     }
 
     public interface ISourceMonitor
@@ -23,10 +23,12 @@ namespace Extension
     {
         public string Solution { get; internal set; }
         public string ActiveDocument { get; internal set; }
-        public SourceMonitorArgs(string solution, string activeDocument)
+        public int CursorPosition { get; internal set; }
+        public SourceMonitorArgs(string solution, string activeDocument, int cursorPosition)
         {
             this.Solution = solution;
             this.ActiveDocument = activeDocument;
+            this.CursorPosition = cursorPosition;
         }
     }
 
@@ -42,7 +44,8 @@ namespace Extension
             {
                 var solutionFullName = GetSolutionFullName(serviceProvider);
                 var activeDocument = GetActiveDocument(serviceProvider);
-                var arguments = new SourceMonitorArgs(solutionFullName, activeDocument);
+                var cursorPosition = GetCursorPosition(serviceProvider);
+                var arguments = new SourceMonitorArgs(solutionFullName, activeDocument, cursorPosition);
                 if (SourceChanged != null)
                 {
                     SourceChanged(this, arguments);
@@ -86,6 +89,25 @@ namespace Extension
                 }
             }
             return activeDocumentFullName;
+        }
+
+        private int GetCursorPosition(IServiceProvider serviceProvider)
+        {
+            var cursorPosition = -1;
+            if (serviceProvider != null)
+            {
+                var dte = (DTE)serviceProvider.GetService(typeof(DTE));
+                if (dte != null)
+                {
+                    var document = dte.ActiveDocument;
+                    if (document != null)
+                    {
+                        var selection = document.Selection as TextSelection;
+                        cursorPosition = selection.ActivePoint.AbsoluteCharOffset;
+                    }
+                }
+            }
+            return cursorPosition;
         }
 
         public void Dispose()
@@ -152,7 +174,10 @@ namespace Extension
         private async void SourceMonitor_SourceChanged(object sender, EventArgs e)
         {
             var arguments = e as SourceMonitorArgs;
-            var content = await ViewGenerator.GenerateViewAsync(arguments.Solution, arguments.ActiveDocument);
+            var content = await ViewGenerator.GenerateViewAsync(
+                arguments.Solution,
+                arguments.ActiveDocument,
+                arguments.CursorPosition);
             ViewController.Draw(content);
         }
 

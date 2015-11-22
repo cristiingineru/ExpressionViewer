@@ -11,7 +11,7 @@ namespace Extension
 {
     public class ExpressionSearcher
     {
-        public async Task<SyntaxNode> FindSource(Solution solution, string activeDocument, int cursorPosition = 0)
+        public async Task<SyntaxNode> FindSource(Solution solution, string activeDocument, int cursorPosition)
         {
             if (solution == null || string.IsNullOrEmpty(activeDocument) || cursorPosition < 0)
             {
@@ -39,7 +39,8 @@ namespace Extension
                 .SelectMany(root => root.DescendantNodesAndSelf())
                 .Where(syntaxNode => syntaxNode.IsKind(Microsoft.CodeAnalysis.CSharp.SyntaxKind.MethodDeclaration))
                 .SelectMany(methodDeclaration => methodDeclaration.DescendantNodesAndSelf())
-                .Where(syntaxNode => syntaxNode.IsKind(Microsoft.CodeAnalysis.CSharp.SyntaxKind.InvocationExpression));
+                .Where(syntaxNode => syntaxNode.IsKind(Microsoft.CodeAnalysis.CSharp.SyntaxKind.InvocationExpression))
+                .Where(syntaxNode => syntaxNode.Span.Contains(cursorPosition));
 
             SyntaxNode foundInvocationExpression = null;
             if (invocationExpressions.Any())

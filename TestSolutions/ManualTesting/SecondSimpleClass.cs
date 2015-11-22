@@ -9,9 +9,17 @@ namespace ManualTesting
 {
     public class SecondSimpleClass
     {
-        public string SecondSimpleMethod()
+        public string CiaoMethod()
         {
             return "Ciao!!!"
+                .Split("-")
+                .Insert(0, "<a>")
+                .Append("</a>");
+        }
+
+        public string SalutMethod()
+        {
+            return "Salut!!!"
                 .Split("-")
                 .Insert(0, "<a>")
                 .Append("</a>");

@@ -20,14 +20,15 @@ namespace ExpressionViewerTests
             var viewController = new Mock<IViewController>(MockBehavior.Loose);
             var solution = "solution.sln";
             var activeDocument = String.Empty;
+            var cursorPosition = 0;
             var content = "content";
             var viewGenerator = new Mock<IViewGenerator>(MockBehavior.Loose);
             viewGenerator
-                .Setup(generator => generator.GenerateViewAsync(solution, activeDocument))
+                .Setup(generator => generator.GenerateViewAsync(solution, activeDocument, cursorPosition))
                 .Returns(Task.FromResult(content));
             var runner = new Runner(sourceMonitor.Object, viewController.Object, viewGenerator.Object);
 
-            sourceMonitor.Raise(mock => mock.SourceChanged += null, new SourceMonitorArgs(solution, activeDocument));
+            sourceMonitor.Raise(mock => mock.SourceChanged += null, new SourceMonitorArgs(solution, activeDocument, cursorPosition));
 
             viewController.Verify(mock => mock.Draw(content), Times.Once());
         }
@@ -50,16 +51,17 @@ namespace ExpressionViewerTests
             var viewController = new Mock<IViewController>(MockBehavior.Loose);
             var solution = "solution.sln";
             var activeDocument = String.Empty;
+            var cursorPosition = 0;
             var content = "content";
             var viewGenerator = new Mock<IViewGenerator>(MockBehavior.Loose);
             viewGenerator
-                .Setup(generator => generator.GenerateViewAsync(solution, activeDocument))
+                .Setup(generator => generator.GenerateViewAsync(solution, activeDocument, cursorPosition))
                 .Returns(Task.FromResult(content));
             var runner = new Runner(sourceMonitor.Object, viewController.Object, viewGenerator.Object);
 
             runner.Dispose();
 
-            sourceMonitor.Raise(mock => mock.SourceChanged += null, new SourceMonitorArgs(solution, activeDocument));
+            sourceMonitor.Raise(mock => mock.SourceChanged += null, new SourceMonitorArgs(solution, activeDocument, cursorPosition));
             viewController.Verify(mock => mock.Draw(content), Times.Never());
         }
 
