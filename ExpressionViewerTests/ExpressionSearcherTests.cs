@@ -18,8 +18,10 @@ namespace ExpressionViewerTests
         {
             var searcher = new ExpressionSearcher();
 
-            var activeDocument = DefaultActiveDocument();
-            var result = await searcher.FindSource(null, activeDocument);
+            var result = await searcher.FindSource(
+                solution: null,
+                activeDocument: DefaultActiveDocument(),
+                cursorPosition: DefaultCursorPosition());
 
             Assert.IsNull(result);
         }
@@ -29,21 +31,23 @@ namespace ExpressionViewerTests
         {
             var searcher = new ExpressionSearcher();
 
-            var solution = EmptySolution();
-            var activeDocument = DefaultActiveDocument();
-            var result = await searcher.FindSource(solution, activeDocument);
+            var result = await searcher.FindSource(
+                solution: EmptySolution(),
+                activeDocument: DefaultActiveDocument(),
+                cursorPosition: DefaultCursorPosition());
 
             Assert.IsNull(result);
         }
 
         [TestMethod]
-        public async Task FindSource_WithInvalidFileName_ReturnsNoValue()
+        public async Task FindSource_WithInvalidActiveDocument_ReturnsNoValue()
         {
             var searcher = new ExpressionSearcher();
 
-            var solution = DefaultSolution();
-            var activeDocument = InvalidActiveDocument();
-            var result = await searcher.FindSource(solution, activeDocument);
+            var result = await searcher.FindSource(
+                solution: DefaultSolution(),
+                activeDocument: InvalidActiveDocument(),
+                cursorPosition: DefaultCursorPosition());
 
             Assert.IsNull(result);
         }
@@ -53,9 +57,23 @@ namespace ExpressionViewerTests
         {
             var searcher = new ExpressionSearcher();
 
-            var solution = DefaultSolution();
-            var activeDocument = WrongActiveDocument();
-            var result = await searcher.FindSource(solution, activeDocument);
+            var result = await searcher.FindSource(
+                solution: DefaultSolution(),
+                activeDocument: WrongActiveDocument(),
+                cursorPosition: DefaultCursorPosition());
+
+            Assert.IsNull(result);
+        }
+
+        [TestMethod]
+        public async Task FindSource_WithInvalidCursorPosition_ReturnsNoValue()
+        {
+            var searcher = new ExpressionSearcher();
+
+            var result = await searcher.FindSource(
+                solution: DefaultSolution(),
+                activeDocument: DefaultActiveDocument(),
+                cursorPosition: InvalidCursorPosition());
 
             Assert.IsNull(result);
         }
@@ -66,12 +84,15 @@ namespace ExpressionViewerTests
             var searcher = new ExpressionSearcher();
 
             var expression = "\"text\".ToString().ToString()";
-            var solution = SingleFileSolution(@"
+            var file = @"
             public void Do() {
                 var result = " + expression + @";
-            }");
+            }";
             var activeDocument = DefaultActiveDocument();
-            var result = await searcher.FindSource(solution, activeDocument);
+            var result = await searcher.FindSource(
+                solution: SingleFileSolution(file),
+                activeDocument: DefaultActiveDocument(),
+                cursorPosition: expression.IndexOf(expression) + 1);
 
             Assert.AreEqual(expression, result.GetText().ToString());
         }
@@ -323,6 +344,16 @@ namespace ExpressionViewerTests
         private string WrongActiveDocument()
         {
             return "noSuchFileAsThis.cs";
+        }
+
+        private int InvalidCursorPosition()
+        {
+            return -1;
+        }
+        
+        private int DefaultCursorPosition()
+        {
+            return 0;
         }
     }
 }

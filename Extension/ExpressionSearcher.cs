@@ -11,9 +11,9 @@ namespace Extension
 {
     public class ExpressionSearcher
     {
-        public async Task<SyntaxNode> FindSource(Solution solution, string activeDocument)
+        public async Task<SyntaxNode> FindSource(Solution solution, string activeDocument, int cursorPosition = 0)
         {
-            if (solution == null || string.IsNullOrEmpty(activeDocument))
+            if (solution == null || string.IsNullOrEmpty(activeDocument) || cursorPosition < 0)
             {
                 return null;
             }
