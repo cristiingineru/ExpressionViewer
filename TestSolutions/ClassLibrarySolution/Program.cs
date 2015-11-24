@@ -15,5 +15,13 @@ namespace ClassLibrary
                 .Append("</a>")
                 .ToString();
         }
+		
+		public void Greatings2()
+        {
+            var greatings = new StringBuilder("!!!Hello!!!")
+                .Insert(0, "<a>")
+                .Append("</a>")
+                .ToString();
+        }
     }
 }

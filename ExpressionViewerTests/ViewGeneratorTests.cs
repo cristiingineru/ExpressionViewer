@@ -52,7 +52,7 @@ namespace ExpressionViewerTests
             var view = await generator.GenerateViewAsync(
                 solutionPath: ClassLibrarySolutionPath(),
                 activeDocument: DefaultDocument(),
-                cursorPosition: ExpressionReturnPosition());
+                cursorPosition: ReturnExpressionPosition());
 
             Assert.IsTrue(IsValidView(view));
         }
@@ -65,7 +65,33 @@ namespace ExpressionViewerTests
             var view = await generator.GenerateViewAsync(
                 solutionPath: ConsoleApplicationSolutionPath(),
                 activeDocument: DefaultDocument(),
-                cursorPosition: ExpressionReturnPosition());
+                cursorPosition: ReturnExpressionPosition());
+
+            Assert.IsTrue(IsValidView(view));
+        }
+
+        [TestMethod]
+        public async Task ViewGenerator_OfReturnExpression_ReturnsView()
+        {
+            var generator = new ViewGenerator();
+
+            var view = await generator.GenerateViewAsync(
+                solutionPath: ClassLibrarySolutionPath(),
+                activeDocument: DefaultDocument(),
+                cursorPosition: ReturnExpressionPosition());
+
+            Assert.IsTrue(IsValidView(view));
+        }
+
+        [TestMethod]
+        public async Task ViewGenerator_OfVarExpression_ReturnsView()
+        {
+            var generator = new ViewGenerator();
+
+            var view = await generator.GenerateViewAsync(
+                solutionPath: ClassLibrarySolutionPath(),
+                activeDocument: DefaultDocument(),
+                cursorPosition: VarExpressionPosition());
 
             Assert.IsTrue(IsValidView(view));
         }
@@ -86,9 +112,14 @@ namespace ExpressionViewerTests
             return "Program.cs";
         }
 
-        private int ExpressionReturnPosition()
+        private int ReturnExpressionPosition()
         {
             return 350;
+        }
+
+        private int VarExpressionPosition()
+        {
+            return 500;
         }
 
         private string InvalidSolutionPath()
