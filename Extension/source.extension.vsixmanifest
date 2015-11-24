@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="ExpressionViewer.CristiIngineru.754ded2d-8c93-4671-9554-61493dc91979" Version="0.2" Language="en-US" Publisher="Cristi Ingineru" />
+    <Identity Id="ExpressionViewer.CristiIngineru.754ded2d-8c93-4671-9554-61493dc91979" Version="0.3" Language="en-US" Publisher="Cristi Ingineru" />
     <DisplayName>ExpressionViewer</DisplayName>
     <Description xml:space="preserve">Roslyn based Visual Studio extension for evaluating C# expressions at edit time.
 Under development.</Description>
