@@ -117,24 +117,33 @@ namespace ExpressionViewerTests
         }
 
         [TestMethod]
-        public async Task FindSource_WithTwoExpressions_ReturnsTheRequestedExpression()
+        public async Task FindSource_MethodWithMultipleExpressions_ReturnsTheRequestedExpression()
         {
-            var searcher = new ExpressionSearcher();
-
-            var expression1 = "\"text1\".ToString().ToString()";
-            var expression2 = "\"text2\".ToString().ToString()";
+            var expressions = new[]
+            {
+                "\"text1\".ToString().ToString()",
+                "\"text2\".ToString().ToString()",
+                "\"text3\".ToString().ToString()"
+            };
             var file = @"
-            public void Do() {
-                var result1 = " + expression1 + @";
-                var result2 = " + expression2 + @";
+            public string Do()
+            {
+                var result1 = " + expressions[0] + @";
+                var result2 = " + expressions[1] + @";
+                return " + expressions[2] + @";
             }";
-            var activeDocument = DefaultActiveDocument();
-            var result = await searcher.FindSource(
-                solution: SingleFileSolution(file),
-                activeDocument: DefaultActiveDocument(),
-                cursorPosition: file.IndexOf(expression2));
 
-            Assert.AreEqual(expression2, result.GetText().ToString());
+            foreach (var expression in expressions)
+            {
+                var searcher = new ExpressionSearcher();
+
+                var result = await searcher.FindSource(
+                    solution: SingleFileSolution(file),
+                    activeDocument: DefaultActiveDocument(),
+                    cursorPosition: file.IndexOf(expression));
+
+                Assert.AreEqual(expression, result.GetText().ToString());
+            }
         }
 
         [TestMethod]
