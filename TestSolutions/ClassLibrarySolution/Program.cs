@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ValidSolution
+namespace ClassLibrary
 {
-    public class SimpleClass
+    public class Program
     {
-        public string SimpleMethod()
+        public string Greatings()
         {
             return new StringBuilder("Hello!!!")
                 .Insert(0, "<a>")

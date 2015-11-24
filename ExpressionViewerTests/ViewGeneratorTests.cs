@@ -23,19 +23,6 @@ namespace ExpressionViewerTests
         }
 
         [TestMethod]
-        public async Task ViewGenerator_WithValidSolution_ReturnsView()
-        {
-            var generator = new ViewGenerator();
-
-            var view = await generator.GenerateViewAsync(
-                solutionPath: ClassLibrarySolutionPath(),
-                activeDocument: "SimpleClass.cs",
-                cursorPosition: 350);
-
-            Assert.IsTrue(IsValidView(view));
-        }
-
-        [TestMethod]
         public async Task ViewGenerator_WithSolutionWithCompileError_DoesntReturnValidView()
         {
             var generator = new ViewGenerator();
@@ -58,14 +45,27 @@ namespace ExpressionViewerTests
         }
 
         [TestMethod]
+        public async Task ViewGenerator_WithClassLibrarySolution_ReturnsView()
+        {
+            var generator = new ViewGenerator();
+
+            var view = await generator.GenerateViewAsync(
+                solutionPath: ClassLibrarySolutionPath(),
+                activeDocument: DefaultDocument(),
+                cursorPosition: ExpressionReturnPosition());
+
+            Assert.IsTrue(IsValidView(view));
+        }
+
+        [TestMethod]
         public async Task ViewGenerator_WithConsoleApplicationSolution_ReturnsView()
         {
             var generator = new ViewGenerator();
 
             var view = await generator.GenerateViewAsync(
                 solutionPath: ConsoleApplicationSolutionPath(),
-                activeDocument: "Program.cs",
-                cursorPosition: 350);
+                activeDocument: DefaultDocument(),
+                cursorPosition: ExpressionReturnPosition());
 
             Assert.IsTrue(IsValidView(view));
         }
@@ -81,19 +81,29 @@ namespace ExpressionViewerTests
             return view.Contains(ItsWorkingWelcomeMessage);
         }
 
+        private string DefaultDocument()
+        {
+            return "Program.cs";
+        }
+
+        private int ExpressionReturnPosition()
+        {
+            return 350;
+        }
+
         private string InvalidSolutionPath()
         {
             return @"drive:\folder\solution.sln";
         }
 
-        private string ClassLibrarySolutionPath()
-        {
-            return @"..\..\..\TestSolutions\ValidSolution\ValidSolution.sln";
-        }
-
         private string SolutionWithCompileErrorPath()
         {
             return @"..\..\..\TestSolutions\SolutionWithCompileError\SolutionWithCompileError.sln";
+        }
+
+        private string ClassLibrarySolutionPath()
+        {
+            return @"..\..\..\TestSolutions\ClassLibrarySolution\ClassLibrarySolution.sln";
         }
 
         private string ConsoleApplicationSolutionPath()
