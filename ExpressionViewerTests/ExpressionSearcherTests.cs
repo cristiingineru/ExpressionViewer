@@ -79,7 +79,7 @@ namespace ExpressionViewerTests
         }
 
         [TestMethod]
-        public async Task FindSource_WithDefaultParameters_ReturnsTheExpression()
+        public async Task FindSource_LookingForExpression_ReturnsTheExpression()
         {
             var searcher = new ExpressionSearcher();
 
@@ -95,6 +95,25 @@ namespace ExpressionViewerTests
                 cursorPosition: file.IndexOf(expression));
 
             Assert.AreEqual(expression, result.GetText().ToString());
+        }
+
+        [TestMethod]
+        public async Task FindSource_LookingForStringConstant_ReturnsTheExpression()
+        {
+            var searcher = new ExpressionSearcher();
+
+            var constant = "\"text\"";
+            var file = @"
+            public void Do() {
+                var result = " + constant + @";
+            }";
+            var activeDocument = DefaultActiveDocument();
+            var result = await searcher.FindSource(
+                solution: SingleFileSolution(file),
+                activeDocument: DefaultActiveDocument(),
+                cursorPosition: file.IndexOf(constant));
+
+            Assert.AreEqual(constant, result.GetText().ToString());
         }
 
         [TestMethod]

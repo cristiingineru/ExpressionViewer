@@ -39,7 +39,7 @@ namespace Extension
                 .SelectMany(root => root.DescendantNodesAndSelf())
                 .Where(syntaxNode => syntaxNode.IsKind(Microsoft.CodeAnalysis.CSharp.SyntaxKind.MethodDeclaration))
                 .SelectMany(methodDeclaration => methodDeclaration.DescendantNodesAndSelf())
-                .Where(syntaxNode => syntaxNode.IsKind(Microsoft.CodeAnalysis.CSharp.SyntaxKind.InvocationExpression))
+                .Where(IsSource)
                 .Where(syntaxNode => syntaxNode.Span.Contains(cursorPosition));
 
             SyntaxNode foundInvocationExpression = null;
@@ -48,6 +48,12 @@ namespace Extension
                 foundInvocationExpression = invocationExpressions.First();
             }
             return foundInvocationExpression;
+        }
+
+        private static bool IsSource(SyntaxNode syntaxNode)
+        {
+            return syntaxNode.IsKind(Microsoft.CodeAnalysis.CSharp.SyntaxKind.InvocationExpression) ||
+                syntaxNode.IsKind(Microsoft.CodeAnalysis.CSharp.SyntaxKind.StringLiteralExpression);
         }
 
         public struct Target
