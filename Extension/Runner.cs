@@ -148,6 +148,16 @@ namespace Extension
         }
     }
 
+
+    public class CursorPositionFixer
+    {
+        public int Fix(string file, int cursorPosition)
+        {
+            return cursorPosition;
+        }
+    }
+
+
     public class Runner : IDisposable
     {
         public ISourceMonitor SourceMonitor { get; private set; }

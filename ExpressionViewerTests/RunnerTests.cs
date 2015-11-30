@@ -154,5 +154,18 @@ namespace ExpressionViewerTests
                 Assert.AreEqual(0, changes);
             }
         }
+
+        [TestMethod]
+        public void CursorPositionFixer_WithMissingFile_ReturnsSamePosition()
+        {
+            var initialCursorPosition = 0;
+            var fixer = new CursorPositionFixer();
+
+            var fixedCursorPosition = fixer.Fix(
+                file: @"C:\missing.file",
+                cursorPosition: initialCursorPosition);
+
+            Assert.AreEqual(initialCursorPosition, fixedCursorPosition);
+        }
     }
 }
