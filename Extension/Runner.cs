@@ -1,6 +1,7 @@
 ﻿using EnvDTE;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -153,7 +154,38 @@ namespace Extension
     {
         public int Fix(string file, int cursorPosition)
         {
+            try
+            {
+                var contentAsBytes = File.ReadAllBytes(file);
+                var lfCount = contentAsBytes.Count(IsLF);
+                var crCount = contentAsBytes.Count(IsCR);
+                var isWindowsFile = lfCount == crCount;
+
+                if (isWindowsFile)
+                {
+                    var contentAsText = File.ReadAllText(file);
+                    contentAsText = contentAsText.Substring(0, cursorPosition);
+                    cursorPosition = cursorPosition - contentAsText.Count(IsCR);
+                }
+            }
+            catch (Exception)
+            { }
             return cursorPosition;
+        }
+
+        private static bool IsLF(byte c)
+        {
+            return c == '\r';
+        }
+
+        private static bool IsCR(byte c)
+        {
+            return c == '\n';
+        }
+
+        private static bool IsCR(char c)
+        {
+            return c == '\n';
         }
     }
 

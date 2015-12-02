@@ -167,5 +167,44 @@ namespace ExpressionViewerTests
 
             Assert.AreEqual(initialCursorPosition, fixedCursorPosition);
         }
+
+        [TestMethod]
+        public void CursorPositionFixer_CRLF_ReturnsSamePosition()
+        {
+            var initialCursorPosition = 3;
+            var fixer = new CursorPositionFixer();
+
+            var fixedCursorPosition = fixer.Fix(
+                file: CRLFEndingFile(),
+                cursorPosition: initialCursorPosition);
+
+            var realCursorPosition = 2;
+            Assert.AreEqual(realCursorPosition, fixedCursorPosition);
+        }
+
+        [TestMethod]
+        public void CursorPositionFixer_LF_ReturnsSamePosition()
+        {
+            var initialCursorPosition = 3;
+            var fixer = new CursorPositionFixer();
+
+            var fixedCursorPosition = fixer.Fix(
+                file: LFEndingFile(),
+                cursorPosition: initialCursorPosition);
+
+            var realCursorPosition = initialCursorPosition;
+            Assert.AreEqual(initialCursorPosition, fixedCursorPosition);
+        }
+
+
+        private string CRLFEndingFile()
+        {
+            return "CRLF.crlf";
+        }
+
+        private string LFEndingFile()
+        {
+            return "LF.lf";
+        }
     }
 }
