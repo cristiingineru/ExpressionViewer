@@ -1,4 +1,5 @@
-﻿using Extension;
+﻿using EnvDTE;
+using Extension;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
@@ -109,7 +110,7 @@ namespace ExpressionViewerTests
                 var arbitraryExpectedChanges = 3;
                 while (changes < arbitraryExpectedChanges)
                 {
-                    Thread.Sleep(10);
+                    System.Threading.Thread.Sleep(10);
                 }
             }
         }
@@ -133,7 +134,7 @@ namespace ExpressionViewerTests
 
                 sourceChangedEvent.WaitOne();
                 var longTimeRequiredToProcessTheEvent = 3000;
-                Thread.Sleep(longTimeRequiredToProcessTheEvent);
+                System.Threading.Thread.Sleep(longTimeRequiredToProcessTheEvent);
                 longHandlerEvent.Set();
 
                 Assert.AreEqual(1, changes);
@@ -150,8 +151,57 @@ namespace ExpressionViewerTests
                 var changes = 0;
                 sourceMonitor.SourceChanged += (s, e) => changes += 1;
                 var arbitraryWaitTime = 1500;
-                Thread.Sleep(arbitraryWaitTime);
+                System.Threading.Thread.Sleep(arbitraryWaitTime);
                 Assert.AreEqual(0, changes);
+            }
+        }
+
+        [TestMethod]
+        public void SourceMonitor_TimerThrowsException_SourceMonitorKeepsIt()
+        {
+            var exception = new Exception();
+            using (var sourceMonitor = new SourceMonitor(null))
+            {
+                sourceMonitor.SourceChanged += (s, e) =>
+                {
+                    throw exception;
+                };
+                System.Threading.Thread.Sleep(1500);
+                Assert.AreEqual(exception, sourceMonitor.LastThreadException);
+            }
+        }
+
+        [TestMethod]
+        public void SourceMonitor_TimerThrowsMultipleExceptions_SourceMonitorKeepsTheLastOne()
+        {
+            var exception1 = new Exception();
+            var exception2 = new Exception();
+            var sourceChanges = 0;
+            using (var sourceMonitor = new SourceMonitor(null))
+            {
+                sourceMonitor.SourceChanged += (s, e) =>
+                {
+                    sourceChanges += 1;
+                    throw (sourceChanges == 1) ? exception1 : exception2;
+                };
+                System.Threading.Thread.Sleep(3000);
+                Assert.AreEqual(exception2, sourceMonitor.LastThreadException);
+            }
+        }
+
+        [TestMethod]
+        public void SourceMonitor_UsingBadDTEToGetSolution_DoesntFail()
+        {
+            var dte = new Mock<DTE>();
+            dte.SetupGet(mock => mock.Solution).Returns(() => { throw new InvalidOperationException(); } );
+
+            var serviceProvider = new Mock<IServiceProvider>();
+            serviceProvider.Setup(mock => mock.GetService(It.IsAny<Type>())).Returns(dte.Object);
+
+            using (var sourceMonitor = new SourceMonitor(serviceProvider.Object))
+            {
+                System.Threading.Thread.Sleep(1500);
+                Assert.IsNotNull(sourceMonitor.LastThreadException);
             }
         }
 

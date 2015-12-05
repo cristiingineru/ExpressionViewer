@@ -37,26 +37,45 @@ namespace Extension
     public class SourceMonitor : ISourceMonitor, IDisposable
     {
         public event EventHandler SourceChanged;
+        public Exception LastThreadException { get; private set; }
+
+        private IServiceProvider ServiceProvider;
+        private CursorPositionFixer CursorPositionFixer;
+        private Timer Timer;
+        private bool Disposed = false;
 
         public SourceMonitor(IServiceProvider serviceProvider)
         {
-            var cursorPositionFixer = new CursorPositionFixer();
+            ServiceProvider = serviceProvider;
+            CursorPositionFixer = new CursorPositionFixer();
             Timer = new Timer(1000);
             Timer.AutoReset = false;
             Timer.Elapsed += (sender, args) =>
             {
-                var solutionFullName = GetSolutionFullName(serviceProvider);
-                var activeDocument = GetActiveDocument(serviceProvider);
-                var cursorPosition = GetCursorPosition(serviceProvider);
-                var fixedCursorPosition = cursorPositionFixer.Fix(activeDocument, cursorPosition);
-                var arguments = new SourceMonitorArgs(solutionFullName, activeDocument, fixedCursorPosition);
-                if (SourceChanged != null)
+                try
                 {
-                    SourceChanged(this, arguments);
+                    PeriodicTaskCore();
+                }
+                catch (Exception e)
+                {
+                    LastThreadException = e;
                 }
                 Timer.Start();
             };
             Timer.Start();
+        }
+
+        private void PeriodicTaskCore()
+        {
+            var solutionFullName = GetSolutionFullName(ServiceProvider);
+            var activeDocument = GetActiveDocument(ServiceProvider);
+            var cursorPosition = GetCursorPosition(ServiceProvider);
+            var fixedCursorPosition = CursorPositionFixer.Fix(activeDocument, cursorPosition);
+            var arguments = new SourceMonitorArgs(solutionFullName, activeDocument, fixedCursorPosition);
+            if (SourceChanged != null)
+            {
+                SourceChanged(this, arguments);
+            }
         }
 
         private string GetSolutionFullName(IServiceProvider serviceProvider)
@@ -116,15 +135,12 @@ namespace Extension
 
         public void Dispose()
         {
-            if (disposed == false)
+            if (Disposed == false)
             {
                 Timer.Stop();
-                disposed = true;
+                Disposed = true;
             }
         }
-
-        private Timer Timer;
-        private bool disposed = false;
     }
 
     public interface IView
