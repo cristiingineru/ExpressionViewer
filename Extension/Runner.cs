@@ -1,6 +1,7 @@
 ﻿using EnvDTE;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -39,6 +40,7 @@ namespace Extension
 
         public SourceMonitor(IServiceProvider serviceProvider)
         {
+            var cursorPositionFixer = new CursorPositionFixer();
             Timer = new Timer(1000);
             Timer.AutoReset = false;
             Timer.Elapsed += (sender, args) =>
@@ -46,7 +48,8 @@ namespace Extension
                 var solutionFullName = GetSolutionFullName(serviceProvider);
                 var activeDocument = GetActiveDocument(serviceProvider);
                 var cursorPosition = GetCursorPosition(serviceProvider);
-                var arguments = new SourceMonitorArgs(solutionFullName, activeDocument, cursorPosition);
+                var fixedCursorPosition = cursorPositionFixer.Fix(activeDocument, cursorPosition);
+                var arguments = new SourceMonitorArgs(solutionFullName, activeDocument, fixedCursorPosition);
                 if (SourceChanged != null)
                 {
                     SourceChanged(this, arguments);
@@ -156,36 +159,24 @@ namespace Extension
         {
             try
             {
-                var contentAsBytes = File.ReadAllBytes(file);
-                var lfCount = contentAsBytes.Count(IsLF);
-                var crCount = contentAsBytes.Count(IsCR);
-                var isWindowsFile = lfCount == crCount;
-
-                if (isWindowsFile)
+                var contentAsText = File.ReadAllText(file);
+                var contentUpToCursor = contentAsText.Substring(0, cursorPosition);
+                var crCount = contentUpToCursor.Count(IsCR);
+                if (crCount > 1)
                 {
-                    var contentAsText = File.ReadAllText(file);
-                    contentAsText = contentAsText.Substring(0, cursorPosition);
-                    cursorPosition = cursorPosition - contentAsText.Count(IsCR);
+                    cursorPosition += crCount - 1;
                 }
+                
             }
             catch (Exception)
-            { }
+            {
+            }
             return cursorPosition;
-        }
-
-        private static bool IsLF(byte c)
-        {
-            return c == '\r';
-        }
-
-        private static bool IsCR(byte c)
-        {
-            return c == '\n';
         }
 
         private static bool IsCR(char c)
         {
-            return c == '\n';
+            return c == '\r';
         }
     }
 

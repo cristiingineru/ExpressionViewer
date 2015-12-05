@@ -169,7 +169,21 @@ namespace ExpressionViewerTests
         }
 
         [TestMethod]
-        public void CursorPositionFixer_CRLF_ReturnsSamePosition()
+        public void CursorPositionFixer_PreCRLF_ReturnsSamePosition()
+        {
+            var initialCursorPosition = 1;
+            var fixer = new CursorPositionFixer();
+
+            var fixedCursorPosition = fixer.Fix(
+                file: CRLFEndingFile(),
+                cursorPosition: initialCursorPosition);
+
+            var realCursorPosition = initialCursorPosition;
+            Assert.AreEqual(realCursorPosition, fixedCursorPosition);
+        }
+
+        [TestMethod]
+        public void CursorPositionFixer_PostSingleCRLF_ReturnsSamePosition()
         {
             var initialCursorPosition = 3;
             var fixer = new CursorPositionFixer();
@@ -178,14 +192,42 @@ namespace ExpressionViewerTests
                 file: CRLFEndingFile(),
                 cursorPosition: initialCursorPosition);
 
-            var realCursorPosition = 2;
+            var realCursorPosition = 3;
             Assert.AreEqual(realCursorPosition, fixedCursorPosition);
         }
 
         [TestMethod]
-        public void CursorPositionFixer_LF_ReturnsSamePosition()
+        public void CursorPositionFixer_PostMultipleCRLF_ReturnsPositionPlusCRMinusOne()
         {
-            var initialCursorPosition = 3;
+            var initialCursorPosition = 10;
+            var fixer = new CursorPositionFixer();
+
+            var fixedCursorPosition = fixer.Fix(
+                file: CRLFEndingFile(),
+                cursorPosition: initialCursorPosition);
+
+            var realCursorPosition = 12;
+            Assert.AreEqual(realCursorPosition, fixedCursorPosition);
+        }
+
+        [TestMethod]
+        public void CursorPositionFixer_PreLF_ReturnsSamePosition()
+        {
+            var initialCursorPosition = 1;
+            var fixer = new CursorPositionFixer();
+
+            var fixedCursorPosition = fixer.Fix(
+                file: LFEndingFile(),
+                cursorPosition: initialCursorPosition);
+
+            var realCursorPosition = initialCursorPosition;
+            Assert.AreEqual(realCursorPosition, fixedCursorPosition);
+        }
+
+        [TestMethod]
+        public void CursorPositionFixer_PostMultipleLF_ReturnsSamePosition()
+        {
+            var initialCursorPosition = 5;
             var fixer = new CursorPositionFixer();
 
             var fixedCursorPosition = fixer.Fix(
