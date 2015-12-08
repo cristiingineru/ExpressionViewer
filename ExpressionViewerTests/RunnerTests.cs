@@ -208,7 +208,7 @@ namespace ExpressionViewerTests
         [TestMethod]
         public void CursorPositionFixer_WithMissingFile_ReturnsSamePosition()
         {
-            var initialCursorPosition = 0;
+            var initialCursorPosition = 1;
             var fixer = new CursorPositionFixer();
 
             var fixedCursorPosition = fixer.Fix(
@@ -219,7 +219,7 @@ namespace ExpressionViewerTests
         }
 
         [TestMethod]
-        public void CursorPositionFixer_PreCRLF_ReturnsSamePosition()
+        public void CursorPositionFixer_PreCRLF_ReturnsSamePositionMinusOne()
         {
             var initialCursorPosition = 1;
             var fixer = new CursorPositionFixer();
@@ -228,7 +228,7 @@ namespace ExpressionViewerTests
                 file: CRLFEndingFile(),
                 cursorPosition: initialCursorPosition);
 
-            var realCursorPosition = initialCursorPosition;
+            var realCursorPosition = initialCursorPosition - 1;
             Assert.AreEqual(realCursorPosition, fixedCursorPosition);
         }
 
@@ -261,7 +261,7 @@ namespace ExpressionViewerTests
         }
 
         [TestMethod]
-        public void CursorPositionFixer_PreLF_ReturnsSamePosition()
+        public void CursorPositionFixer_PreLF_ReturnsSamePositionMinusOne()
         {
             var initialCursorPosition = 1;
             var fixer = new CursorPositionFixer();
@@ -270,12 +270,12 @@ namespace ExpressionViewerTests
                 file: LFEndingFile(),
                 cursorPosition: initialCursorPosition);
 
-            var realCursorPosition = initialCursorPosition;
+            var realCursorPosition = initialCursorPosition - 1;
             Assert.AreEqual(realCursorPosition, fixedCursorPosition);
         }
 
         [TestMethod]
-        public void CursorPositionFixer_PostMultipleLF_ReturnsSamePosition()
+        public void CursorPositionFixer_PostMultipleLF_ReturnsSamePositionMinusOne()
         {
             var initialCursorPosition = 5;
             var fixer = new CursorPositionFixer();
@@ -284,8 +284,8 @@ namespace ExpressionViewerTests
                 file: LFEndingFile(),
                 cursorPosition: initialCursorPosition);
 
-            var realCursorPosition = initialCursorPosition;
-            Assert.AreEqual(initialCursorPosition, fixedCursorPosition);
+            var realCursorPosition = initialCursorPosition - 1;
+            Assert.AreEqual(realCursorPosition, fixedCursorPosition);
         }
 
 

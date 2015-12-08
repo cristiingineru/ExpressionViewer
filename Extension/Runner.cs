@@ -178,11 +178,8 @@ namespace Extension
                 var contentAsText = File.ReadAllText(file);
                 var contentUpToCursor = contentAsText.Substring(0, cursorPosition);
                 var crCount = contentUpToCursor.Count(IsCR);
-                if (crCount > 1)
-                {
-                    cursorPosition += crCount - 1;
-                }
-                
+                cursorPosition -= 1;
+                cursorPosition += crCount;
             }
             catch (Exception)
             {
