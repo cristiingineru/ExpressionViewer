@@ -42,3 +42,7 @@ TestResults
 bin
 obj
 .suo
+
+# NuGet packages #
+##################
+packages/
