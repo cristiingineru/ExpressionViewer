@@ -50,6 +50,17 @@ namespace ExpressionViewerTests
             Assert.AreEqual("string", wrapperMethodReturnType.ToString());
         }
 
+        public async Task BuildWrapper_WithConstant_ReturnsTheEnclosedConstant()
+        {
+            var value = SyntaxFactory.Literal("constant");
+            var constant = SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralToken, value);
+
+            var builder = new ExpressionBuilder();
+            var result = await builder.BuildWrapper(constant);
+
+            Assert.IsTrue(result.DescendantNodesAndSelf().Contains(constant));
+        }
+
         private async Task<SyntaxNode> BuildWrapper_WithNullInnerExpression()
         {
             var builder = new ExpressionBuilder();
