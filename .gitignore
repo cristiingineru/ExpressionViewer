@@ -42,7 +42,3 @@ TestResults
 bin
 obj
 .suo
-
-# Keeping the packages in #
-###########################
-!packages
