@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Linq;
 using System.Collections.Generic;
+using TSG = ExpressionViewerTests.TestSolutionGenerator;
 
 namespace ExpressionViewerTests
 {
@@ -32,7 +33,7 @@ namespace ExpressionViewerTests
             var searcher = new ExpressionSearcher();
 
             var result = await searcher.FindSource(
-                solution: EmptySolution(),
+                solution: TSG.EmptySolution(),
                 activeDocument: DefaultActiveDocument(),
                 cursorPosition: DefaultCursorPosition());
 
@@ -45,7 +46,7 @@ namespace ExpressionViewerTests
             var searcher = new ExpressionSearcher();
 
             var result = await searcher.FindSource(
-                solution: DefaultSolution(),
+                solution: TSG.DefaultSolution(),
                 activeDocument: InvalidActiveDocument(),
                 cursorPosition: DefaultCursorPosition());
 
@@ -58,7 +59,7 @@ namespace ExpressionViewerTests
             var searcher = new ExpressionSearcher();
 
             var result = await searcher.FindSource(
-                solution: DefaultSolution(),
+                solution: TSG.DefaultSolution(),
                 activeDocument: WrongActiveDocument(),
                 cursorPosition: DefaultCursorPosition());
 
@@ -71,7 +72,7 @@ namespace ExpressionViewerTests
             var searcher = new ExpressionSearcher();
 
             var result = await searcher.FindSource(
-                solution: DefaultSolution(),
+                solution: TSG.DefaultSolution(),
                 activeDocument: DefaultActiveDocument(),
                 cursorPosition: InvalidCursorPosition());
 
@@ -88,9 +89,8 @@ namespace ExpressionViewerTests
             public void Do() {
                 var result = " + expression + @";
             }";
-            var activeDocument = DefaultActiveDocument();
             var result = await searcher.FindSource(
-                solution: SingleFileSolution(file),
+                solution: TSG.SingleFileSolution(file),
                 activeDocument: DefaultActiveDocument(),
                 cursorPosition: file.IndexOf(expression));
 
@@ -107,9 +107,8 @@ namespace ExpressionViewerTests
             public void Do() {
                 var result = " + constant + @";
             }";
-            var activeDocument = DefaultActiveDocument();
             var result = await searcher.FindSource(
-                solution: SingleFileSolution(file),
+                solution: TSG.SingleFileSolution(file),
                 activeDocument: DefaultActiveDocument(),
                 cursorPosition: file.IndexOf(constant));
 
@@ -126,9 +125,8 @@ namespace ExpressionViewerTests
             public void Do() {
                 var result = " + expression + @";
             }";
-            var activeDocument = DefaultActiveDocument();
             var result = await searcher.FindSource(
-                solution: SingleFileSolution(file),
+                solution: TSG.SingleFileSolution(file),
                 activeDocument: DefaultActiveDocument(),
                 cursorPosition: file.IndexOf(expression) - 1);
 
@@ -157,7 +155,7 @@ namespace ExpressionViewerTests
                 var searcher = new ExpressionSearcher();
 
                 var result = await searcher.FindSource(
-                    solution: SingleFileSolution(file),
+                    solution: TSG.SingleFileSolution(file),
                     activeDocument: DefaultActiveDocument(),
                     cursorPosition: file.IndexOf(expression));
 
@@ -181,7 +179,7 @@ namespace ExpressionViewerTests
         {
             var searcher = new ExpressionSearcher();
 
-            var solution = EmptySolution();
+            var solution = TSG.EmptySolution();
             var result = await searcher.FindTarget(solution);
 
             Assert.IsNull(result.Node);
@@ -193,7 +191,7 @@ namespace ExpressionViewerTests
         {
             var searcher = new ExpressionSearcher();
 
-            var solution = SingleFileSolution(@"
+            var solution = TSG.SingleFileSolution(@"
             namespace SimpleNamespace {
                 public class SimpleClass() {
                     public void Do() {
@@ -211,7 +209,7 @@ namespace ExpressionViewerTests
         public async Task InsertNodeInCompilation_WithOldAndNewNodes_ReturnsNewUpdatedCompilation()
         {
             var searcher = new ExpressionSearcher();
-            var solution = SingleFileSolution(@"
+            var solution = TSG.SingleFileSolution(@"
             namespace SimpleNamespace {
                 public class SimpleClass() {
                     public void Do() {
@@ -231,7 +229,7 @@ namespace ExpressionViewerTests
         {
             var searcher = new ExpressionSearcher();
             var oldClassName = "SimpleClass";
-            var solution = SingleFileSolution(@"
+            var solution = TSG.SingleFileSolution(@"
             namespace " + oldClassName + @" {
                 public class SimpleClass() {
                     public void Do() {
@@ -336,60 +334,7 @@ namespace ExpressionViewerTests
 
             Assert.IsTrue(result);
         }
-
-        private Solution EmptySolution()
-        {
-            var id = SolutionId.CreateNewId();
-            var version = new VersionStamp();
-            var solutionInfo = SolutionInfo.Create(id, version);
-            var workspace = new AdhocWorkspace();
-            var solution = workspace.AddSolution(solutionInfo);
-
-            return solution;
-        }
-
-        private Solution DefaultSolution()
-        {
-            var defaultContent = @"
-            namespace SimpleNamespace {
-                public class SimpleClass() {
-                    public void Do() {
-                        var x = ""text"".ToString().ToString();
-                    }
-                }
-            }";
-            var defaultSolution = SingleFileSolution(defaultContent);
-
-            return defaultSolution;
-        }
-
-        private Solution SingleFileSolution(string fileContent)
-        {
-            var id = SolutionId.CreateNewId();
-            var version = new VersionStamp();
-            var solutionInfo = SolutionInfo.Create(id, version);
-            var workspace = new AdhocWorkspace();
-            var solution = workspace.AddSolution(solutionInfo);
-
-            var projectId = ProjectId.CreateNewId();
-            var projectInfo = NewProjectInfo(projectId);
-            solution = solution.AddProject(projectInfo);
-            var project = solution.GetProject(projectId);
-
-            var root = CSharpSyntaxTree.ParseText(fileContent).GetRoot();
-            var documentName = DefaultActiveDocument();
-            var document = project.AddDocument(documentName, root);
-
-            return document.Project.Solution;
-        }
-
-        private ProjectInfo NewProjectInfo(ProjectId projectId)
-        {
-            var version = VersionStamp.Create();
-            var projectInfo = ProjectInfo.Create(projectId, version, "no name", "assembly.dll", "C#");
-
-            return projectInfo;
-        }
+        
 
         private static IEnumerable<ClassDeclarationSyntax> GetClassDeclarationSyntaxes(Compilation compilation)
         {
@@ -406,7 +351,7 @@ namespace ExpressionViewerTests
 
         private string DefaultActiveDocument()
         {
-            return "file.cs";
+            return TSG.DefaultActiveDocument();
         }
 
         private string WrongActiveDocument()
