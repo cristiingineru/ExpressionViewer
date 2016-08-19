@@ -363,7 +363,7 @@ namespace ExpressionViewerTests
             return defaultSolution;
         }
 
-        private Solution SingleFileSolution(string fileContent)
+        public static Solution SingleFileSolution(string fileContent)
         {
             var id = SolutionId.CreateNewId();
             var version = new VersionStamp();
@@ -383,7 +383,7 @@ namespace ExpressionViewerTests
             return document.Project.Solution;
         }
 
-        private ProjectInfo NewProjectInfo(ProjectId projectId)
+        private static ProjectInfo NewProjectInfo(ProjectId projectId)
         {
             var version = VersionStamp.Create();
             var projectInfo = ProjectInfo.Create(projectId, version, "no name", "assembly.dll", "C#");
@@ -404,7 +404,7 @@ namespace ExpressionViewerTests
             return String.Empty;
         }
 
-        private string DefaultActiveDocument()
+        public static string DefaultActiveDocument()
         {
             return "file.cs";
         }

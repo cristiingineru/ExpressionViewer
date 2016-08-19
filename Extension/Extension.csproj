@@ -53,6 +53,7 @@
   <ItemGroup>
     <Compile Include="AssemblyRunner.cs" />
     <Compile Include="ExpressionBuilder.cs" />
+    <Compile Include="ExpressionPatcher.cs" />
     <Compile Include="ExpressionSearcher.cs" />
     <Compile Include="ExpressionViewer.cs" />
     <Compile Include="ExpressionViewerCommand.cs" />

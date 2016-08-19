@@ -107,6 +107,7 @@
   <ItemGroup>
     <Compile Include="AssemblyRunnerTests.cs" />
     <Compile Include="ExpressionBuilderTests.cs" />
+    <Compile Include="ExpressionPatcherTests.cs" />
     <Compile Include="ExpressionSearcherTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RunnerTests.cs" />
