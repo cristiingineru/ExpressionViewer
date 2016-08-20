@@ -111,6 +111,7 @@
     <Compile Include="ExpressionSearcherTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RunnerTests.cs" />
+    <Compile Include="SingleFileSolution.cs" />
     <Compile Include="TempDirectoryTests.cs" />
     <Compile Include="ViewGeneratorTests.cs" />
   </ItemGroup>

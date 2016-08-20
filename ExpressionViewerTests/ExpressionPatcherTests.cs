@@ -18,8 +18,8 @@ namespace ExpressionViewerTests
             var patcher = new ExpressionPatcher();
 
             var file = "public void Do() {}";
-            var solution = ExpressionSearcherTests.SingleFileSolution(file);
-            var compilation = await CompilationFromSingleProjectSolution(solution);
+            var solution = SingleFileSolution.New(file);
+            var compilation = await CompilationOfSingleProjectSolution(solution);
             var variables = patcher.GetVariableDependencies(null, compilation);
 
             Assert.IsFalse(variables.Any());
@@ -36,12 +36,12 @@ namespace ExpressionViewerTests
             public void Do() {
                 var result = " + expression + @";
             }";
-            var solution = ExpressionSearcherTests.SingleFileSolution(file);
+            var solution = SingleFileSolution.New(file);
             var source = await searcher.FindSource(
                 solution: solution,
-                activeDocument: ExpressionSearcherTests.DefaultActiveDocument(),
+                activeDocument: SingleFileSolution.ActiveDocument(),
                 cursorPosition: file.IndexOf(expression));
-            var compilation = await CompilationFromSingleProjectSolution(solution);
+            var compilation = await CompilationOfSingleProjectSolution(solution);
             var variables = patcher.GetVariableDependencies(source, null);
 
             Assert.IsFalse(variables.Any());
@@ -58,13 +58,13 @@ namespace ExpressionViewerTests
             public void Do() {
                 var result = " + expression + @";
             }";
-            var activeDocument = ExpressionSearcherTests.DefaultActiveDocument();
-            var solution = ExpressionSearcherTests.SingleFileSolution(file);
+            var activeDocument = SingleFileSolution.ActiveDocument();
+            var solution = SingleFileSolution.New(file);
             var source = await searcher.FindSource(
                 solution: solution,
-                activeDocument: ExpressionSearcherTests.DefaultActiveDocument(),
+                activeDocument: SingleFileSolution.ActiveDocument(),
                 cursorPosition: file.IndexOf(expression));
-            var compilation = await CompilationFromSingleProjectSolution(solution);
+            var compilation = await CompilationOfSingleProjectSolution(solution);
 
             var variables = patcher.GetVariableDependencies(source, compilation);
 
@@ -82,14 +82,14 @@ namespace ExpressionViewerTests
             public void Do(string variable) {
                 var result = " + expression + @";
             }";
-            var activeDocument = ExpressionSearcherTests.DefaultActiveDocument();
-            var solution = ExpressionSearcherTests.SingleFileSolution(file);
+            var activeDocument = SingleFileSolution.ActiveDocument();
+            var solution = SingleFileSolution.New(file);
             var source = await searcher.FindSource(
                 solution: solution,
-                activeDocument: ExpressionSearcherTests.DefaultActiveDocument(),
+                activeDocument: SingleFileSolution.ActiveDocument(),
                 cursorPosition: file.IndexOf(expression));
             var target = await searcher.FindTarget(solution);
-            var compilation = await CompilationFromSingleProjectSolution(solution);
+            var compilation = await CompilationOfSingleProjectSolution(solution);
 
             var variables = patcher.GetVariableDependencies(source, compilation);
 
@@ -108,14 +108,14 @@ namespace ExpressionViewerTests
                 string variable = ""value"";
                 var result = " + expression + @";
             }";
-            var activeDocument = ExpressionSearcherTests.DefaultActiveDocument();
-            var solution = ExpressionSearcherTests.SingleFileSolution(file);
+            var activeDocument = SingleFileSolution.ActiveDocument();
+            var solution = SingleFileSolution.New(file);
             var source = await searcher.FindSource(
                 solution: solution,
-                activeDocument: ExpressionSearcherTests.DefaultActiveDocument(),
+                activeDocument: SingleFileSolution.ActiveDocument(),
                 cursorPosition: file.IndexOf(expression));
             var target = await searcher.FindTarget(solution);
-            var compilation = await CompilationFromSingleProjectSolution(solution);
+            var compilation = await CompilationOfSingleProjectSolution(solution);
 
             var variables = patcher.GetVariableDependencies(source, compilation);
 
@@ -136,14 +136,14 @@ namespace ExpressionViewerTests
                     var result = " + expression + @";
                 }
             }";
-            var activeDocument = ExpressionSearcherTests.DefaultActiveDocument();
-            var solution = ExpressionSearcherTests.SingleFileSolution(file);
+            var activeDocument = SingleFileSolution.ActiveDocument();
+            var solution = SingleFileSolution.New(file);
             var source = await searcher.FindSource(
                 solution: solution,
-                activeDocument: ExpressionSearcherTests.DefaultActiveDocument(),
+                activeDocument: SingleFileSolution.ActiveDocument(),
                 cursorPosition: file.IndexOf(expression));
             var target = await searcher.FindTarget(solution);
-            var compilation = await CompilationFromSingleProjectSolution(solution);
+            var compilation = await CompilationOfSingleProjectSolution(solution);
 
             var variables = patcher.GetVariableDependencies(source, compilation);
 
@@ -165,14 +165,14 @@ namespace ExpressionViewerTests
                     var result = " + expression + @";
                 }
             }";
-            var activeDocument = ExpressionSearcherTests.DefaultActiveDocument();
-            var solution = ExpressionSearcherTests.SingleFileSolution(file);
+            var activeDocument = SingleFileSolution.ActiveDocument();
+            var solution = SingleFileSolution.New(file);
             var source = await searcher.FindSource(
                 solution: solution,
-                activeDocument: ExpressionSearcherTests.DefaultActiveDocument(),
+                activeDocument: SingleFileSolution.ActiveDocument(),
                 cursorPosition: file.IndexOf(expression));
             var target = await searcher.FindTarget(solution);
-            var compilation = await CompilationFromSingleProjectSolution(solution);
+            var compilation = await CompilationOfSingleProjectSolution(solution);
 
             var variables = patcher.GetVariableDependencies(source, compilation);
 
@@ -194,21 +194,21 @@ namespace ExpressionViewerTests
                     var result = " + expression + @";
                 }
             }";
-            var activeDocument = ExpressionSearcherTests.DefaultActiveDocument();
-            var solution = ExpressionSearcherTests.SingleFileSolution(file);
+            var activeDocument = SingleFileSolution.ActiveDocument();
+            var solution = SingleFileSolution.New(file);
             var source = await searcher.FindSource(
                 solution: solution,
-                activeDocument: ExpressionSearcherTests.DefaultActiveDocument(),
+                activeDocument: SingleFileSolution.ActiveDocument(),
                 cursorPosition: file.IndexOf(expression));
             var target = await searcher.FindTarget(solution);
-            var compilation = await CompilationFromSingleProjectSolution(solution);
+            var compilation = await CompilationOfSingleProjectSolution(solution);
 
             var variables = patcher.GetVariableDependencies(source, compilation);
 
             Assert.IsFalse(variables.Any());
         }
 
-        public static async Task<Compilation> CompilationFromSingleProjectSolution(Solution solution)
+        public static async Task<Compilation> CompilationOfSingleProjectSolution(Solution solution)
         {
             var project = await solution.Projects.First().GetCompilationAsync();
             return project;

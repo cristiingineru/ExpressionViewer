@@ -20,7 +20,7 @@ namespace ExpressionViewerTests
 
             var result = await searcher.FindSource(
                 solution: null,
-                activeDocument: DefaultActiveDocument(),
+                activeDocument: SingleFileSolution.ActiveDocument(),
                 cursorPosition: DefaultCursorPosition());
 
             Assert.IsNull(result);
@@ -33,7 +33,7 @@ namespace ExpressionViewerTests
 
             var result = await searcher.FindSource(
                 solution: EmptySolution(),
-                activeDocument: DefaultActiveDocument(),
+                activeDocument: SingleFileSolution.ActiveDocument(),
                 cursorPosition: DefaultCursorPosition());
 
             Assert.IsNull(result);
@@ -72,7 +72,7 @@ namespace ExpressionViewerTests
 
             var result = await searcher.FindSource(
                 solution: DefaultSolution(),
-                activeDocument: DefaultActiveDocument(),
+                activeDocument: SingleFileSolution.ActiveDocument(),
                 cursorPosition: InvalidCursorPosition());
 
             Assert.IsNull(result);
@@ -88,10 +88,10 @@ namespace ExpressionViewerTests
             public void Do() {
                 var result = " + expression + @";
             }";
-            var activeDocument = DefaultActiveDocument();
+            var activeDocument = SingleFileSolution.ActiveDocument();
             var result = await searcher.FindSource(
-                solution: SingleFileSolution(file),
-                activeDocument: DefaultActiveDocument(),
+                solution: SingleFileSolution.New(file),
+                activeDocument: SingleFileSolution.ActiveDocument(),
                 cursorPosition: file.IndexOf(expression));
 
             Assert.AreEqual(expression, result.GetText().ToString());
@@ -107,10 +107,10 @@ namespace ExpressionViewerTests
             public void Do() {
                 var result = " + constant + @";
             }";
-            var activeDocument = DefaultActiveDocument();
+            var activeDocument = SingleFileSolution.ActiveDocument();
             var result = await searcher.FindSource(
-                solution: SingleFileSolution(file),
-                activeDocument: DefaultActiveDocument(),
+                solution: SingleFileSolution.New(file),
+                activeDocument: SingleFileSolution.ActiveDocument(),
                 cursorPosition: file.IndexOf(constant));
 
             Assert.AreEqual(constant, result.GetText().ToString());
@@ -126,10 +126,10 @@ namespace ExpressionViewerTests
             public void Do() {
                 var result = " + expression + @";
             }";
-            var activeDocument = DefaultActiveDocument();
+            var activeDocument = SingleFileSolution.ActiveDocument();
             var result = await searcher.FindSource(
-                solution: SingleFileSolution(file),
-                activeDocument: DefaultActiveDocument(),
+                solution: SingleFileSolution.New(file),
+                activeDocument: SingleFileSolution.ActiveDocument(),
                 cursorPosition: file.IndexOf(expression) - 1);
 
             Assert.IsNull(result);
@@ -157,8 +157,8 @@ namespace ExpressionViewerTests
                 var searcher = new ExpressionSearcher();
 
                 var result = await searcher.FindSource(
-                    solution: SingleFileSolution(file),
-                    activeDocument: DefaultActiveDocument(),
+                    solution: SingleFileSolution.New(file),
+                    activeDocument: SingleFileSolution.ActiveDocument(),
                     cursorPosition: file.IndexOf(expression));
 
                 Assert.AreEqual(expression, result.GetText().ToString());
@@ -193,7 +193,7 @@ namespace ExpressionViewerTests
         {
             var searcher = new ExpressionSearcher();
 
-            var solution = SingleFileSolution(@"
+            var solution = SingleFileSolution.New(@"
             namespace SimpleNamespace {
                 public class SimpleClass() {
                     public void Do() {
@@ -211,7 +211,7 @@ namespace ExpressionViewerTests
         public async Task InsertNodeInCompilation_WithOldAndNewNodes_ReturnsNewUpdatedCompilation()
         {
             var searcher = new ExpressionSearcher();
-            var solution = SingleFileSolution(@"
+            var solution = SingleFileSolution.New(@"
             namespace SimpleNamespace {
                 public class SimpleClass() {
                     public void Do() {
@@ -231,7 +231,7 @@ namespace ExpressionViewerTests
         {
             var searcher = new ExpressionSearcher();
             var oldClassName = "SimpleClass";
-            var solution = SingleFileSolution(@"
+            var solution = SingleFileSolution.New(@"
             namespace " + oldClassName + @" {
                 public class SimpleClass() {
                     public void Do() {
@@ -358,37 +358,9 @@ namespace ExpressionViewerTests
                     }
                 }
             }";
-            var defaultSolution = SingleFileSolution(defaultContent);
+            var defaultSolution = SingleFileSolution.New(defaultContent);
 
             return defaultSolution;
-        }
-
-        public static Solution SingleFileSolution(string fileContent)
-        {
-            var id = SolutionId.CreateNewId();
-            var version = new VersionStamp();
-            var solutionInfo = SolutionInfo.Create(id, version);
-            var workspace = new AdhocWorkspace();
-            var solution = workspace.AddSolution(solutionInfo);
-
-            var projectId = ProjectId.CreateNewId();
-            var projectInfo = NewProjectInfo(projectId);
-            solution = solution.AddProject(projectInfo);
-            var project = solution.GetProject(projectId);
-
-            var root = CSharpSyntaxTree.ParseText(fileContent).GetRoot();
-            var documentName = DefaultActiveDocument();
-            var document = project.AddDocument(documentName, root);
-
-            return document.Project.Solution;
-        }
-
-        private static ProjectInfo NewProjectInfo(ProjectId projectId)
-        {
-            var version = VersionStamp.Create();
-            var projectInfo = ProjectInfo.Create(projectId, version, "no name", "assembly.dll", "C#");
-
-            return projectInfo;
         }
 
         private static IEnumerable<ClassDeclarationSyntax> GetClassDeclarationSyntaxes(Compilation compilation)
@@ -402,11 +374,6 @@ namespace ExpressionViewerTests
         private string InvalidActiveDocument()
         {
             return String.Empty;
-        }
-
-        public static string DefaultActiveDocument()
-        {
-            return "file.cs";
         }
 
         private string WrongActiveDocument()
