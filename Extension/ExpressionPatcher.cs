@@ -10,8 +10,13 @@ namespace Extension
 {
     public class ExpressionPatcher
     {
-        public IEnumerable<object> GetOutOfScopeVariables(SyntaxNode expression, Compilation compilation)
+        public IEnumerable<object> GetVariableDependencies(SyntaxNode expression, Compilation compilation)
         {
+            if (expression == null || compilation == null)
+            {
+                return Enumerable.Empty<object>();
+            }
+
             var syntaxTree = expression.SyntaxTree;
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
 
@@ -19,10 +24,13 @@ namespace Extension
                 .DescendantNodes()
                 .Where(d => d.IsKind(SyntaxKind.IdentifierName));
 
-            var x = identifiers
-                .Select(identifier => semanticModel.GetSymbolInfo(identifier));
+            var symbols = identifiers
+                .Select(identifier => semanticModel.GetSymbolInfo(identifier))
+                .Select(info => info.Symbol)
+                .Where(symbol => symbol != null);
+                //.Where(symbol => symbol is Microsoft.CodeAnalysis.CSharp.Symbols.SourceMemberFieldSymbol).ToList();
 
-            return Enumerable.Empty<object>();
+            return symbols.Select(symbol => symbol as object);
         }
     }
 }
