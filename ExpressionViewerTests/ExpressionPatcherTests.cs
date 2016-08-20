@@ -180,16 +180,17 @@ namespace ExpressionViewerTests
         }
 
         [TestMethod]
-        public async Task GetVariableDependencies_ExpressionDependingOnMemberConstant_ReturnsEmptyEnumerable()
+        public async Task GetVariableDependencies_ExpressionDependingOnConstants_ReturnsEmptyEnumerable()
         {
             var patcher = new ExpressionPatcher();
 
             var searcher = new ExpressionSearcher();
-            var expression = "\"text\".ToString().Insert(0, variable).ToString()";
+            var expression = "\"text\".ToString().Insert(0, constant1).Insert(0, constant2).ToString()";
             var file = @"
             public class SmallClass {
-                public const string variable = ""value"";
+                public const string constant1 = ""value"";
                 public void Do() {
+                    string const constant2 = ""value"";
                     var result = " + expression + @";
                 }
             }";
@@ -204,7 +205,7 @@ namespace ExpressionViewerTests
 
             var variables = patcher.GetVariableDependencies(source, compilation);
 
-            Assert.AreEqual(0, variables.Count());
+            Assert.IsFalse(variables.Any());
         }
 
         public static async Task<Compilation> CompilationFromSingleProjectSolution(Solution solution)

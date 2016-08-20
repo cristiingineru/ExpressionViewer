@@ -10,27 +10,17 @@ namespace Extension
 {
     public class ExpressionPatcher
     {
-        public IEnumerable<object> GetVariableDependencies(SyntaxNode expression, Compilation compilation)
+        public IEnumerable<ISymbol> GetVariableDependencies(SyntaxNode expression, Compilation compilation)
         {
             if (expression == null || compilation == null)
             {
-                return Enumerable.Empty<object>();
+                return Enumerable.Empty<ISymbol>();
             }
 
-            var syntaxTree = expression.SyntaxTree;
-            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var semanticModel = compilation.GetSemanticModel(expression.SyntaxTree);
+            var variables = semanticModel.AnalyzeDataFlow(expression).DataFlowsIn;
 
-            var identifiers = syntaxTree.GetRoot()
-                .DescendantNodes()
-                .Where(d => d.IsKind(SyntaxKind.IdentifierName));
-
-            var symbols = identifiers
-                .Select(identifier => semanticModel.GetSymbolInfo(identifier))
-                .Select(info => info.Symbol)
-                .Where(symbol => symbol != null);
-                //.Where(symbol => symbol is Microsoft.CodeAnalysis.CSharp.Symbols.SourceMemberFieldSymbol).ToList();
-
-            return symbols.Select(symbol => symbol as object);
+            return variables;
         }
     }
 }
