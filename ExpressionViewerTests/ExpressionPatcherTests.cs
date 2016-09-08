@@ -151,7 +151,7 @@ namespace ExpressionViewerTests
         }
 
         [TestMethod]
-        public async Task GetVariableDependencies_ExpressionDependingOnMultipleVariableTypes_ReturnsThoseVariable()
+        public async Task GetVariableDependencies_ExpressionDependingOnMultipleVariableTypes_ReturnsThoseVariables()
         {
             var patcher = new ExpressionPatcher();
 
@@ -206,6 +206,66 @@ namespace ExpressionViewerTests
             var variables = patcher.GetVariableDependencies(source, compilation);
 
             Assert.IsFalse(variables.Any());
+        }
+
+        [TestMethod]
+        public async Task ReplaceVariablesWithConstants_IndependentExpression_ReturnsSameExpression()
+        {
+            var patcher = new ExpressionPatcher();
+
+            var searcher = new ExpressionSearcher();
+            var expression = "\"text\".ToString().ToString()";
+            var file = @"
+            public void Do() {
+                var result = " + expression + @";
+            }";
+            var activeDocument = SingleFileSolution.ActiveDocument();
+            var solution = SingleFileSolution.New(file);
+            var source = await searcher.FindSource(
+                solution: solution,
+                activeDocument: SingleFileSolution.ActiveDocument(),
+                cursorPosition: file.IndexOf(expression));
+            var compilation = await CompilationOfSingleProjectSolution(solution);
+            var variables = patcher.GetVariableDependencies(source, compilation);
+
+            var newSource = patcher.ReplaceVariablesWithConstants(source, variables);
+
+            Assert.AreEqual(source, newSource);
+        }
+
+        [TestMethod]
+        public async Task ReplaceVariablesWithConstants_ExpressionDependingOnArgument_ReturnsIndependentExpression()
+        {
+            var patcher = new ExpressionPatcher();
+
+            var searcher = new ExpressionSearcher();
+            var expression = "\"text\".ToString().Insert(0, variable).ToString()";
+            var file = @"
+            using System;
+            namespace SimpleNamespace {
+                public class SimpleClass() {
+                    public void Main(string variable) {
+                        var result = " + expression + @";
+                    }
+                }
+            }";
+            var activeDocument = SingleFileSolution.ActiveDocument();
+            var solution = SingleFileSolution.New(file);
+            var source = await searcher.FindSource(
+                solution: solution,
+                activeDocument: SingleFileSolution.ActiveDocument(),
+                cursorPosition: file.IndexOf(expression));
+            var target = await searcher.FindTarget(solution);
+            var compilation = await CompilationOfSingleProjectSolution(solution);
+            var variables = patcher.GetVariableDependencies(source, compilation);
+
+            var newSource = patcher.ReplaceVariablesWithConstants(source, variables);
+
+            var expressionBuilder = new ExpressionBuilder();
+            var instrumentation = await expressionBuilder.BuildWrapper(newSource);
+            var newCompilation = searcher.InsertNodeInCompilation(target.Compilation, target.Node, instrumentation);
+            var errors = target.Compilation.GetDiagnostics();
+            Assert.IsFalse(errors.Any());
         }
 
         public static async Task<Compilation> CompilationOfSingleProjectSolution(Solution solution)

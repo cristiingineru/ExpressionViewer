@@ -22,5 +22,10 @@ namespace Extension
 
             return variables;
         }
+
+        public SyntaxNode ReplaceVariablesWithConstants(SyntaxNode espression, IEnumerable<ISymbol> variables)
+        {
+            return espression;
+        }
     }
 }

@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis.CSharp;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,9 +26,22 @@ namespace ExpressionViewerTests
 
             var root = CSharpSyntaxTree.ParseText(fileContent).GetRoot();
             var documentName = ActiveDocument();
-            var document = project.AddDocument(documentName, root);
+            //var document = project.AddDocument(documentName, root);
 
-            return document.Project.Solution;
+            var assemblyPath = Path.GetDirectoryName(typeof(object).Assembly.Location);
+            project = project.AddMetadataReferences(
+        new[]
+                    {
+                        MetadataReference.CreateFromFile(Path.Combine(assemblyPath, "mscorlib.dll")),
+                        MetadataReference.CreateFromFile(Path.Combine(assemblyPath, "System.dll")),
+                        MetadataReference.CreateFromFile(Path.Combine(assemblyPath, "System.Core.dll")),
+                        MetadataReference.CreateFromFile(Path.Combine(assemblyPath, "System.Runtime.dll"))
+                    });
+
+            //return document.Project.Solution;
+
+            var document = project.AddDocument(documentName, root);
+            return project.Solution;
         }
 
         private static ProjectInfo NewProjectInfo(ProjectId projectId)
